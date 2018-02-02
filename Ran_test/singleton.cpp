@@ -30,8 +30,8 @@ Singleton * Singleton::GetInstance()
 {
     if(m_pInstance == NULL)
     {
-//        Lock();
-        if(m_pInstance == NULL)
+//        Lock();    //为了效率，先判断null再进来锁住临界区
+        if(m_pInstance == NULL)   //防止其他进程同时进入创建
             m_pInstance = new Singleton;
 //        Unlock();
     }
