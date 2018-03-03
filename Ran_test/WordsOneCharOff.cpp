@@ -17,9 +17,10 @@ std::map<std::string, std::vector<std::string>> computeAdjacentWords(const std::
             std::map<std::string, std::vector<std::string>> repToWords;
             for (int k = 0; k < groupsWords.size(); ++k) {
                 std::string rep = groupsWords[k];
-                rep.erase(j, 1);
+                rep.erase(j, 1);    //同一位置的char删去
                 repToWords[rep].push_back(groupsWords[k]);
             }
+            //step2
             std::map<std::string, std::vector<std::string>>::const_iterator itr2;
             for(itr2 = repToWords.begin(); itr2 != repToWords.end(); itr2++){
                 const std::vector<std::string> clique = (*itr2).second; //& ???不行
@@ -32,7 +33,7 @@ std::map<std::string, std::vector<std::string>> computeAdjacentWords(const std::
                     }
                 }
             }
-        }
+        } // 将其提前，便是计算只差一个字符，不管其位置，现在的代码考虑其位置
     }
 
     return adjMap;
@@ -77,7 +78,7 @@ std::map<std::string, std::vector<std::string>> computeAdjacentWords_medium(cons
 
 
 int main(int argc, char* argv[]){
-    std::vector<std::string> words = {"wine", "line", "fine", "mine", "ji", "ik", "il", "duck"};
+    std::vector<std::string> words = {"wine", "line", "fine", "mine", "ineg", "inek", "ji", "ik", "il", "duck"};
     std::map<std::string, std::vector<std::string>> adj1 = computeAdjacentWords(words);
 //    std::map<std::string, std::vector<std::string>> adj2 = computeAdjacentWords_medium(words);
 
