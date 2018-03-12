@@ -56,6 +56,7 @@ template <typename T> T myStruct<T>::pop(){
 template <typename T> T myStruct<T>::top(){
     if(que1.empty() && que2.empty())
         throw std::exception();
+    //throw new exception("stack is empty!");
     if(!que1.empty())
         return que1.back();
     else
@@ -64,6 +65,7 @@ template <typename T> T myStruct<T>::top(){
 
 int main(){
     myStruct<int> mystruct;
+//    mystruct.pop();
 
     mystruct.push(1);
     mystruct.push(2);
