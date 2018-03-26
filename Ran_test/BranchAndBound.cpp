@@ -34,9 +34,9 @@ public:
                 curVal = parentVal + box[level];
                 if(curVal > best && curVal <= cap){
                     best = curVal;
-                    if(level < max-1)
-                        queue1.push(curVal);
                 }
+                if(level < max-1 && curVal <= cap)
+                    queue1.push(curVal);
 
                 //right child
                 temp = 0;
@@ -60,8 +60,8 @@ public:
 
 int main(){
     Solution a;
-    int arr[] ={10,35,20,50,70};
-    cout<<a.BranchAndBound(5, 40, arr)<<endl;
+    int arr[] ={10,15,20};
+    cout<<a.BranchAndBound(3, 35, arr)<<endl;
 
 
     return 0;
