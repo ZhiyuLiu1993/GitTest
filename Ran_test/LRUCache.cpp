@@ -24,9 +24,9 @@ public:
 class LRUCache{
 public:
     int capacity;
-    unordered_map<int, Node*> map;
-    Node *head = nullptr;
-    Node *end = nullptr;
+    unordered_map<int, Node*> map;    //store key, value is just display
+    Node *head = nullptr;             //head is new node
+    Node *end = nullptr;              //end is to delete
 
     LRUCache(int capacity){
         this->capacity = capacity;
@@ -76,7 +76,7 @@ public:
         } else{
             Node *temp = new Node(key, value);
             if(map.size() > capacity){
-                map.erase(end->value);
+                map.erase(end->key);
                 remove(end);
             }
             setHead(temp);
@@ -106,6 +106,7 @@ int main() {
     lruCache.set(5,5);
     cout<<" get(1):"<<lruCache.get(1)<<endl;
     lruCache.set(6,6);
+    lruCache.set(5,10);
     cout<<" get(2):"<<lruCache.get(4)<<endl;
 
     return 0;
