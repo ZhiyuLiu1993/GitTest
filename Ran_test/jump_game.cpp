@@ -21,12 +21,28 @@ public:
         }
         return dp[n-1];
     }
+
+    int jump_game_nospace(int A[], int n){
+        int jumps = 0;
+        int curEnd = 0;
+        int curFarthest = 0;
+        for (int i = 0; i < n - 1; ++i) {
+            curFarthest = max(curFarthest, A[i] + i);
+            if(i == curEnd){
+                ++jumps;
+                curEnd = curFarthest;
+            }
+        }
+        return jumps;
+    }
 };
 
 int main() {
     Solution a;
-    int A[] = {2, 3, 1, 1, 2};
-    cout<<a.jump_game(A, sizeof(A)/sizeof(int))<<endl;
+//    int A[] = {2, 3, 1, 1, 2};
+    int A[] = {1};
+//    cout<<a.jump_game(A, sizeof(A)/sizeof(int))<<endl;
+    cout<<a.jump_game_nospace(A, sizeof(A)/sizeof(int))<<endl;
 
     return (0);
 }
