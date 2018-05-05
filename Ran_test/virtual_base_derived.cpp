@@ -23,15 +23,15 @@ public:
 class B2: virtual A{   //if public   sizoef(B2)  16
 public:
     int b2;
-//    int get() override {  //no unique final overrider for ‘virtual int A::get()’ in ‘C’
-//        return b2;
-//    }
+    int get() override {
+        return b2;
+    }
 };
 
 class C: public B1, public B2{   //sizeof(C)  48
 public:
     int c;
-//    int get() override {
+//    int get() override {   //no unique final overrider for ‘virtual int A::get()’ in ‘C’
 //        return c;
 //    }
 };
