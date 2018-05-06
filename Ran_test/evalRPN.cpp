@@ -30,7 +30,7 @@ public:
                  sta.push(c);
              }
              else{
-                 stringstream ss;
+                 stringstream ss;   /// *****string to int, ip transform
                  ss<<tok;
                  int temp;
                  ss>>temp;
