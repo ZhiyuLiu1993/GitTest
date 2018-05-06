@@ -42,6 +42,19 @@ public:
 };
 
 int main() {
+    string str("192.168.1.2");
+    stringstream ss;
+    ss<<str;
+    int p1, p2, p3, p4;
+    char a;
+    ss>>p1;
+    ss>>a;
+    ss>>p2;
+    ss>>a;
+    ss>>p3;
+    ss>>a;
+    ss>>p4;
+    cout<<p1<<" "<<p2<< " "<<p3<<" "<<p4<<endl;
 
     return (0);
 }
