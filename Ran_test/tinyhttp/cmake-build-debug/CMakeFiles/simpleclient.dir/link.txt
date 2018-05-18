@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/simpleclient.dir/simpleclient.c.o  -o simpleclient 

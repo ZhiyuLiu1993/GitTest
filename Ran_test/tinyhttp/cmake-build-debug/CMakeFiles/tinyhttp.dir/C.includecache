@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lzy/GitTest/Ran_test/tinyhttp/httpd.c
+stdio.h
+-
+sys/socket.h
+-
+sys/types.h
+-
+netinet/in.h
+-
+arpa/inet.h
+-
+unistd.h
+-
+ctype.h
+-
+string.h
+-
+strings.h
+-
+sys/stat.h
+-
+sys/wait.h
+-
+stdlib.h
+-
+

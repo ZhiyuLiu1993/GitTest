@@ -1,0 +1,4 @@
+/home/lzy/GitTest/Ran_test/tinyhttp/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/lzy/GitTest/Ran_test/tinyhttp/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/lzy/GitTest/Ran_test/tinyhttp/cmake-build-debug/CMakeFiles/simpleclient.dir
+/home/lzy/GitTest/Ran_test/tinyhttp/cmake-build-debug/CMakeFiles/tinyhttp.dir
