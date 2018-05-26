@@ -20,7 +20,7 @@ int main(){
     sleep(5);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     address.sin_family = AF_INET;
-    address.sin_port = htons(51268);
+    address.sin_port = htons(80);
     //inet_addr应该换为inet_pton  支持IpV4和IpV6
     //if(inet_pton(AF_INET, "127.0.0.1", &address.sin_addr) == -1)
     address.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -33,14 +33,13 @@ int main(){
         exit(1);
     }
     char buf[1024];
-    buf[0] = 'A';
-    buf[1] = '\0';
 
+    sprintf(buf, "GET /");
     send(sockfd, buf, sizeof(buf), 0);
 
-
-    read(sockfd, buf, sizeof(buf));
-    printf("cahr from sever = %s\n", buf);
+    ssize_t nread;
+    while((nread = read(sockfd, buf, sizeof(buf))) != 0)
+        printf("char from sever = %s\n", buf);
     close(sockfd);
     exit(0);
 }

@@ -293,7 +293,7 @@ void accept_request(int client){
 
     //POST则将cgi置1
     if(strcasecmp(method, "POST") == 0){
-        cgi = 0;
+        cgi = 1;
     }
 
     i = 0;
@@ -302,7 +302,7 @@ void accept_request(int client){
         ++j;
     }
 
-    while(!ISspace(buf[j] && (i < sizeof(url) - 1) && (j < sizeof(buf)))){
+    while(!ISspace(buf[j]) && (i < sizeof(url) - 1) && (j < sizeof(buf))){
         url[i] = buf[j];
         ++i;
         ++j;
@@ -324,7 +324,7 @@ void accept_request(int client){
         }
     }
 
-    sprintf(path, "mydocs%s", url);
+    sprintf(path, "../mydocs%s", url);
 
     if(path[strlen(path) - 1] == '/'){
         strcat(path, "index.html");
@@ -427,7 +427,7 @@ void unimplemented(int client){
 
 int main(){
     int server_sock = -1;
-    u_short port = 0;
+    u_short port = 80; //0表示由系统决定
     int client_sock = -1;
 
     struct sockaddr_in client_name;

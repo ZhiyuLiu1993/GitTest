@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/simpleclient.dir/simpleclient.c.o  -o simpleclient 
+/usr/bin/cc  -g -Wall -O2 -g   CMakeFiles/simpleclient.dir/simpleclient.c.o  -o simpleclient 

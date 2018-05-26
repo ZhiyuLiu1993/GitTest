@@ -33,6 +33,7 @@ class Solution{
 
 				for(int i = k; i <= g_MaxValue*k; ++i){
 					pProbabilities[1-flag][i] = 0; 
+					//此处j<i 否则为0不算错但无意义
 					for(int j = 1; j < i && j <= g_MaxValue; ++j){
 						pProbabilities[1-flag][i] += pProbabilities[flag][i-j];
 
