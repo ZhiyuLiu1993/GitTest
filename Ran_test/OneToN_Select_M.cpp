@@ -16,21 +16,57 @@ using namespace std;
 
 class Solution{
 public:
-    void Permutation(string Str, int begin){
-        if(begin == Str.size() - 1){   //-1 才能与下面的+1匹配，否则此条件永远不满足
-            cout<<Str<<endl;
+    void BagProblem_Solution_Recur(int n, int m, int *flag, int len)
+    {
+        if(n < 1 || m < 1)
+            return;
+
+        if(n < m)
+        {
+            flag[n-1] = 1;
+            BagProblem_Solution_Recur(n-1, m-n, flag, len); //选了n
+            flag[n-1] = 0;
+            BagProblem_Solution_Recur(n-1, m, flag, len);   //不选n
         }
-        else{
-            for(int i = begin+1; i < Str.size(); ++i){   //此处+1  计算的是原字母不在其原始位置上的排列    最终begin就不会到size大小
-                char temp = Str[i];
-                Str[i] = Str[begin];
-                Str[begin] = temp;
+        else
+        {
+            flag[m-1] = 1;  //n>=m，选中m即可
+            for(int i = 0; i < len; i++)
+            {
+                if(flag[i] == 1)
+                    cout<<i+1<<' ';
+            }
+            cout<<endl;
+            flag[m-1] = 0; //不选m，继续递归。比如n = 10,m = 8，求出{1, 7}后，仍需继续，{1,3,4} {1,2,5}都是解
+            BagProblem_Solution_Recur(m-1, m, flag, len);
+        }
+    }
 
-                Permutation(Str, begin+1);
+    void BagProblem_Solution_Itera(int n, int m)
+    {
+        if(n < 1|| m < 1)
+            return;
+        if(n > m)
+            n = m;
 
-                temp = Str[i];
-                Str[i] = Str[begin];
-                Str[begin] = temp;
+        int num = 1<<n;               //枚举次数
+        for(int i = 1; i < num; i++)  //枚举所有情况
+        {
+            int sum = 0;
+            int j, k;
+            for(j = i, k = 1; j != 0; j>>=1, k++) //针对每种情况求和，判断是否满足条件
+            {
+                if(j&1)
+                    sum += k;
+            }
+            if(sum == m) //如果满足，打印结果
+            {
+                for(j = i, k = 1; j != 0; j>>=1, k++)
+                {
+                    if(j&1)
+                        cout<<k<<' ';
+                }
+                cout<<endl;
             }
         }
     }
@@ -40,9 +76,6 @@ public:
 int main() {
     Solution a;
 
-    string str("abc");
-
-    a.Permutation(str, 0);
 
     return (0);
 }

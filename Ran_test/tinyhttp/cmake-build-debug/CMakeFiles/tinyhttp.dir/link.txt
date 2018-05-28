@@ -1,1 +1,1 @@
-/usr/bin/cc  -g -Wall -O2 -g   CMakeFiles/tinyhttp.dir/httpd.c.o  -o tinyhttp 
+/usr/bin/cc  -g -Wall -O2 -W -g   CMakeFiles/tinyhttp.dir/httpd.c.o  -o tinyhttp -lpthread 

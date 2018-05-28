@@ -1,30 +1,38 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
 #include <stack>
+#include <sstream>
+
 
 using namespace std;
 
-//不使用辅助栈，空间复杂读为O(1),minval存储当前最小值，栈里存储的值都是与当前值minval的差值，均大于等于0
 
-class Solution {
+class Solution{
 public:
     void push(int value) {
         if(sta.empty() || value < minval){
+            int temp = minval;
             minval = value;
-            sta.push(0);
+            sta.push(value - temp);
         }else{
             sta.push(value - minval);
         }
     }
     void pop() {
         if(!sta.empty()){
-            if(sta.top() + minval == minval){
+            if(sta.top() < 0){
+                minval = minval - sta.top();
                 sta.pop();
-                minval = sta.top() + minval;
                 return;
             }
             if(sta.top() + minval > minval){
                 sta.pop();
                 return;
+            }
+            else {//更新最小值
+
             }
         }else{
             throw std::exception();
@@ -50,7 +58,16 @@ private:
 
 };
 
-int main(){
+int main() {
+    Solution a;
+    a.push(3);
+    cout<<a.min()<<endl;
+    a.push(2);
+    cout<<a.min()<<endl;
+    a.push(1);
+    cout<<a.min()<<endl;
+    a.pop();
+    cout<<a.min()<<endl;
 
-    return 0;
+    return (0);
 }

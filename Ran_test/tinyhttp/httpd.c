@@ -18,7 +18,7 @@
 
 #define ISspace(x) isspace((int)(x))
 
-#define SERVER_STRING "Server: myhttpd/0.1.0\r\n"
+#define SERVER_STRING "Server: tinyhttpd/0.1.0\r\n"
 
 void accept_request(int);
 void bad_request(int);
@@ -36,13 +36,23 @@ void unimplemented(int);
 void not_found(int client){
     char buf[1024];
 
-    sprintf(buf, "HTTP/1.0 200 OK\r\n");
+    sprintf(buf, "HTTP/1.0 400 NOT FOUND\r\n");
     send(client, buf, sizeof(buf), 0);
     sprintf(buf, SERVER_STRING);
     send(client, buf, sizeof(buf), 0);
     sprintf(buf, "Content-type: text/html\r\n");
     send(client, buf, sizeof(buf), 0);
     sprintf(buf, "\r\n");
+    send(client, buf, sizeof(buf), 0);
+    sprintf(buf, "<HTML><TITLE>Not Found</TITLE>\r\n");
+    send(client, buf, sizeof(buf), 0);
+    sprintf(buf, "<BODY><P>The server could not fulfill\r\n");
+    send(client, buf, sizeof(buf), 0);
+    sprintf(buf, "your request because the resource specified\r\n");
+    send(client, buf, sizeof(buf), 0);
+    sprintf(buf, "is unavailable or nonexistent.\r\n");
+    send(client, buf, sizeof(buf), 0);
+    sprintf(buf, "</BODY></HTML>\r\n");
     send(client, buf, sizeof(buf), 0);
 }
 
@@ -63,13 +73,13 @@ void headers(int client, const char *filename){
     char buf[1024];
     (void)filename;   //可以使用filename决定是什么文件类型
 
-    sprintf(buf, "HTTP/1.0 200 OK\r\n");
+    strcpy(buf, "HTTP/1.0 200 OK\r\n");
     send(client, buf, sizeof(buf), 0);
-    sprintf(buf, SERVER_STRING);
+    strcpy(buf, SERVER_STRING);
     send(client, buf, sizeof(buf), 0);
-    sprintf(buf, "Content-type: text/html\r\n");
+    sprintf(buf, "Content-Type: text/html\r\n");
     send(client, buf, sizeof(buf), 0);
-    sprintf(buf, "\r\n");
+    strcpy(buf, "\r\n");
     send(client, buf, sizeof(buf), 0);
 }
 
@@ -103,6 +113,7 @@ void serve_file(int client, const char *filename){
         headers(client, filename);
         //把文件内容读出来作为body发回
         cat(client, resource);
+//        printf("33\n");
     }
 
     fclose(resource);
@@ -324,23 +335,26 @@ void accept_request(int client){
         }
     }
 
-    sprintf(path, "../mydocs%s", url);
+    sprintf(path, "/home/lzy/tinyhttpd/htdocs%s", url);
 
     if(path[strlen(path) - 1] == '/'){
         strcat(path, "index.html");
     }
+//    printf("%s\n", path);
 
     //查询当前文件是否存在
     if(stat(path, &st) == -1){
         while((numchars > 0) && strcmp("\n", buf)){
             numchars = get_line(client, buf, sizeof(buf));
         }
+//        printf("err!\n");
         not_found(client);
     }else{
         //文件存在，与S_IFMT,相与之后值可以用来判断是什么类型文件
         if((st.st_mode & S_IFMT) == S_IFDIR){
             strcat(path, "/index.html");
         }
+//        printf("ok!\n");
 
         //只要下列一个置位，表示其为可执行文件
         if((st.st_mode & S_IXUSR) ||
@@ -427,7 +441,7 @@ void unimplemented(int client){
 
 int main(){
     int server_sock = -1;
-    u_short port = 80; //0表示由系统决定
+    u_short port = 0; //0表示由系统决定
     int client_sock = -1;
 
     struct sockaddr_in client_name;
