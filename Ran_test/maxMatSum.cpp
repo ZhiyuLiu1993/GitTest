@@ -34,14 +34,15 @@ public:
             }
         }
 
+        //从右上角到左下角
         int maxsum = 0x80000000;
-        for(i = 1; i <= n; ++i){   //每行1-n  2-n  n-n
+        for(i = 1; i <= n; ++i){   //每行1~n  2~n  n~n
             for(j = i; j <= n; ++j){
                 int start;
                 int all;
                 start = all = B[j][m-1] - B[i-1][m-1];
-                for(k = m - 2; k >= 0; --k){   //每列从最左边开始
-                    start = max(B[j][k] - B[i-1][k], start + B[j][k] - B[i-1][k]);
+                for(k = m - 2; k >= 0; --k){   //每列从最右边开始
+                    start = max(B[j][k] - B[i-1][k], start + B[j][k] - B[i-1][k]);  //每次减去0~n-1行
                     all = max(all, start);
                 }
                 if(all > maxsum){
