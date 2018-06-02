@@ -13,7 +13,7 @@ public:
             return -1;
         int left = 0;
         int right = length - 1;
-        while(left < right){
+        while(left <= right){
             int mid = (left + right)/2;
             if(mid != numbers[mid]){
                 if(mid == 0 || (mid > 0 && (mid-1 == numbers[mid-1])))

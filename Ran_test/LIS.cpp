@@ -30,7 +30,7 @@ public:
     int BinarySearch(int *b, int len, int w){
         int left = 0;
         int right = len - 1;
-        while(left < right){
+        while(left <= right){    //如果是<  则下面的right = mid；
             int mid = left + ((right - left)>>1);
             if(b[mid] > w)
                 right = mid - 1;
