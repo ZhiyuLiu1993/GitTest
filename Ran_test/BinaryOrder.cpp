@@ -11,7 +11,7 @@ typedef struct BINARY_TREE_{
 void iterativePreorder(Binary_Tree *root){
     std::stack<Binary_Tree *> sta;
     Binary_Tree *node;
-    if(root == nullptr){
+    if(root != nullptr){
         sta.push(root);
         while(!sta.empty()){
             node = sta.top();
