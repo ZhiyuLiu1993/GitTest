@@ -2,6 +2,9 @@
 
 #include "Features.h"
 #include "Num.h"
+#include "Comparing.h"
+
+#include <sys/time.h>
 
 #define TEST_FINAL 0
 
@@ -27,11 +30,11 @@ int main() {
 //    std::cout << euclideanDistance(s1, s2) << std::endl;
 
     //####2
-//    Eigen::MatrixXf input(3, 4);
+//    Eigen::MatrixXf input(3, 10);
 ////    Eigen::Matrix<float, 3, 4, Eigen::RowMajor> input(3, 4);
-//    input << 1.1, 2.2, 0.1, 2.1,
-//            1.3, 2.2, 3.1, 4.1,
-//            4.1, 3.2, 2.1, 1.1;
+//    input << 1.1, 2.2, 0.1, 2.1, 0.00001, 0.6666, 212, 0.000007, 0.000007, 0.000006,
+//            0.00001, 0.6666, 212, 0.00007, 1.3, 2.2, 3.1, 4.1, 0.00002, 000001,
+//            4.1, 3.2, 2.1, 0.000003, 1.1, 0.0000032, 0.443545, 0.00000031, 0.00000031, 0.0000001;
 ////    Eigen::MatrixXf input(4, 3);
 ////    input << 1.1, 2.2, 0.1,
 ////            2.1, 1.3, 2.2,
@@ -39,6 +42,8 @@ int main() {
 ////            3.2, 2.1, 1.1;
 ////            1.1, 2.2, 0.1, 2.0;
 //    std::cout << input << std::endl;
+//    Eigen::MatrixXi output = argsort(input, 1);
+//    std::cout << output << std::endl;
 //
     //####3
 //    Eigen::MatrixXi output = argsort(input, 1);
@@ -258,13 +263,32 @@ int main() {
 //    std::cout << input << std::endl;
 
     //####10
-//    Eigen::MatrixXf input1(4, 4);
+//    Eigen::MatrixXf input1(1025, 980);
 //    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> input1;
 //    input1.resize(4, 4);
-//    input1 << 0.079,0.894,1.164,0.432,
-//            1.994,1.834,0.764,0.276,
-//            5.867,4.208,2.733,3.606,
-//            3.488,7.303,8.798,9.142;
+//    std::ifstream indata;
+//
+//    indata.open("./song/front.csv");
+//
+//    std::string                line;
+//    while (getline(indata, line))
+//    {
+//        std::stringstream          lineStream(line);
+//        std::string                cell;
+//
+//        while (std::getline(lineStream, cell, ','))
+//        {
+//            std::cout << cell << std::endl;
+//            //Process cell
+//        }
+//    }
+//    Eigen::MatrixXf input1(3, 4);
+//    input1 <<
+//            4,5,6,5,
+//            1,2,3,4,
+//            4,6,7,8;
+//    std::cout << input1*TIMES << std::endl;
+//    input1 = ampliTudeToDb(input1);
 //    std::cout << input1 << std::endl;
 //    input1 = input1.block(0,0,4,3);
 //    input1 = input1.block<3,4>(0, 0);
@@ -287,6 +311,54 @@ int main() {
 //    for (int j = 0; j < 10; ++j) {
 //        std::cout << matrix[0][j] << ' ';
 //    }
+
+    //####12
+//    Eigen::MatrixXf input1(4, 4);
+//    input1.resize(3, 4);
+//    input1 << 0.079,0.894,1.164,0.432,
+//            1.994,1.834,0.764,0.276,
+//            3.488,7.303,8.798,9.142;
+//    std::cout << input1 << std::endl;
+//    std::cout << std::endl;
+////    input1.transposeInPlace();
+//    Eigen::MatrixXf out = input1.transpose();
+//    std::cout << out << std::endl;
+
+    //####MOST
+    std::string path1 = "./song/z.wav";
+    std::string path2 = "./song/2.wav";
+    std::string path3 = "./song/1530242944.wav";
+    std::string path4= "./song/1530243052.wav";
+    std::string path5 = "./song/1530243158.wav";
+    std::string path6 = "./song/1530243258.wav";
+    std::string path7 = "./song/1530243263.wav";
+    std::string path8 = "./song/1530243284.wav";
+
+//    struct timeval tv;
+//    struct timeval tv2;
+//    gettimeofday(&tv, NULL);
+    clock_t startTime, endTime;
+    std::vector<std::string> path;
+    path.push_back(path1);
+    path.push_back(path2);
+    path.push_back(path3);
+    path.push_back(path4);
+    path.push_back(path5);
+    path.push_back(path6);
+    path.push_back(path7);
+    path.push_back(path8);
+    std::cout << sim_distance(path1, path2, path3) << std::endl;
+//    for (int i = 0; i < path.size(); ++i) {
+//        startTime = clock();
+//        std::cout << sim_distance(path1, path2, path[i]) << std::endl;
+//        endTime = clock();
+//        std::cout << "path" << i+1 << "  Total Time : " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//        std::cout << "********************" <<std::endl;
+//    }
+//    gettimeofday(&tv2, NULL);
+//    std::cout << (tv2.tv_sec*1000 + tv2.tv_usec/1000 - tv.tv_sec*1000 + tv.tv_usec/1000);
+//    std::cout << sim_distance(path1, path2, path3) << std::endl;
+//    std::cout << sim_distance(path1, path2, path3) << std::endl;
 
     return 0;
 }

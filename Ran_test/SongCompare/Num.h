@@ -9,6 +9,10 @@
 #include <math.h>
 #include <eigen3/Eigen/Dense>
 
+#include <fstream>
+
+#define FILE 0
+
 extern Eigen::MatrixXi FFT_FRE;
 //初始化频率向量，因为无法在全局进行,这个函数必须在开始时调用
 void frequencyInit();
@@ -33,5 +37,7 @@ Eigen::MatrixXf maximum(float num, const Eigen::MatrixXf &input);
 
 //
 Eigen::MatrixXf powerToDb(const Eigen::MatrixXf &input, float ref=1e-10, float amin=1e-10, float top_db=80.0);
+
+
 
 #endif //SONGCOMPARE_NUM_H
