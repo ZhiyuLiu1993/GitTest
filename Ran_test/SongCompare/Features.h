@@ -14,6 +14,8 @@
 #include <essentia/essentiamath.h> // for the isSilent function
 #include <essentia/pool.h>
 
+#include <samplerate.h>
+
 using namespace essentia;
 using namespace standard;
 
@@ -37,7 +39,8 @@ const int SET_MIN_DB = -100;
 
 const int FRAMESIZE = 2048;
 const int HOPSIZE = 512;
-const int SAMPLERATE = 44100;
+const float SAMPLERATE = 44100.0;
+const float ORRSAMPLE = 16000.0;
 
 enum {GREATE = 0, SMALL = 1};
 
@@ -57,10 +60,15 @@ Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input);
 
 //  特征处理模块的函数
 Eigen::MatrixXf original_music(std::string path1, std::string path2);
+Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2);
 
 Eigen::MatrixXf features(std::string path3);
+Eigen::MatrixXf features_buffer(std::string path3);
 
 //获取stft后的矩阵
 static void stft(std::string path, Eigen::MatrixXf &out);
+static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out);
+
+static void readFile(std::string path, std::vector<Real> &audio);
 
 #endif //SONGCOMPARE_FEATURES_H

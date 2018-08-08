@@ -11,7 +11,10 @@
 
 #include <fstream>
 
-#define FILE 0
+#define FILEP 0
+#define INFILE 0
+
+static int IF_INIT = 0;
 
 extern Eigen::MatrixXi FFT_FRE;
 //初始化频率向量，因为无法在全局进行,这个函数必须在开始时调用

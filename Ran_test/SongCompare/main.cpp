@@ -4,14 +4,20 @@
 #include "Num.h"
 #include "Comparing.h"
 
-#include <sys/time.h>
+#include <cstdio>
+#include <cstdlib>
 
-#define TEST_FINAL 0
+#include <sys/time.h>
+#include <samplerate.h>
+
+
+//#define TEST_FINAL 0
 
 //void set(int *a){
 //    a[0] = 100;
 //}
 //extern Eigen::MatrixXi FFT_FRE;
+using namespace std;
 
 int main() {
     //####1
@@ -30,19 +36,19 @@ int main() {
 //    std::cout << euclideanDistance(s1, s2) << std::endl;
 
     //####2
-//    Eigen::MatrixXf input(3, 10);
-////    Eigen::Matrix<float, 3, 4, Eigen::RowMajor> input(3, 4);
-//    input << 1.1, 2.2, 0.1, 2.1, 0.00001, 0.6666, 212, 0.000007, 0.000007, 0.000006,
-//            0.00001, 0.6666, 212, 0.00007, 1.3, 2.2, 3.1, 4.1, 0.00002, 000001,
-//            4.1, 3.2, 2.1, 0.000003, 1.1, 0.0000032, 0.443545, 0.00000031, 0.00000031, 0.0000001;
-////    Eigen::MatrixXf input(4, 3);
-////    input << 1.1, 2.2, 0.1,
-////            2.1, 1.3, 2.2,
-////            3.1, 4.1, 4.3,
-////            3.2, 2.1, 1.1;
-////            1.1, 2.2, 0.1, 2.0;
+//    Eigen::MatrixXf input(3, 9);
+//////    Eigen::Matrix<float, 3, 4, Eigen::RowMajor> input(3, 4);
+//    input << 1.1, 2.2, 0.1, 2.1, 0.00001, 0.6666, 212, 0.000007, 0.000007,
+//            0.00001, 0.6666, 212, 0.00007, 1.3, 2.2, 3.1, 4.1, 0.00002,
+//            4.1, 3.2, 2.1, 0.000003, 1.1, 0.0000032, 0.443545, 0.00000031, 0.00000031,
+//////    Eigen::MatrixXf input(4, 3);
+//////    input << 1.1, 2.2, 0.1,
+//////            2.1, 1.3, 2.2,
+//////            3.1, 4.1, 4.3,
+//////            3.2, 2.1, 1.1;
+//////            1.1, 2.2, 0.1, 2.0;
 //    std::cout << input << std::endl;
-//    Eigen::MatrixXi output = argsort(input, 1);
+//    Eigen::MatrixXi output = argsort(input, 0);
 //    std::cout << output << std::endl;
 //
     //####3
@@ -135,15 +141,26 @@ int main() {
 //
 //
 //     register the algorithms in the factory(ies
-#if TEST_FINAL
-    essentia::init();
-    Pool pool;
+#if 0
+//    essentia::init();
+//    Pool pool;
 
     /////// PARAMS //////////////
     int framesize = 2048;
     int hopsize = 512;
     int sr = 44100;
-    std::string audioFilename = "./song/z.wav";
+    std::string audioFilename = "./song/pcm/1530243263.pcm";
+    FILE *f;
+    f = fopen(audioFilename.c_str(), "rb");
+    if(f == NULL)
+        return -1;
+    fseek(f, 0, SEEK_END);
+    unsigned int len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    char *buffer = (char *)malloc(len);
+    len = fread(buffer, 1, len, f);
+    fclose(f);
+
 
     // register the algorithms in the factory(ies)
     essentia::init();
@@ -151,15 +168,17 @@ int main() {
 
     // audio loader (we always need it...)
     Algorithm* audioload = factory.create("MonoLoader",
-                                          "filename", audioFilename,
+//                                          "filename", audioFilename,
                                           "sampleRate",sr,
                                           "downmix","mix");
 //    cout << audioload << endl;
     std::vector<Real> audio;
-    audioload->output("audio").set(audio);
-    audioload->compute();
+    for (int j = 0; j < len; ++j) {
+        audio.push_back(*buffer++);
+    }
+//    audioload->output("audio").set(audio);
+//    audioload->compute();
     std::cout << "monophonic pitch estimation Yin FFT" << std::endl;
-
 
     // create algorithms
     Algorithm* frameCutter = factory.create("FrameCutter",
@@ -234,7 +253,7 @@ int main() {
 
     // write to csv file
 //    ofstream outfile(argv[2]);
-    std::cout << "time   pitch [Hz]  pitch confidence" << std::endl;
+//    std::cout << "time   pitch [Hz]  pitch confidence" << std::endl;
 //    cout << spec[0] << endl;
 
 //    for (int i=0; i<(int)time.size(); i++){
@@ -325,29 +344,50 @@ int main() {
 //    std::cout << out << std::endl;
 
     //####MOST
-    std::string path1 = "./song/z.wav";
-    std::string path2 = "./song/2.wav";
-    std::string path3 = "./song/1530242944.wav";
-    std::string path4= "./song/1530243052.wav";
-    std::string path5 = "./song/1530243158.wav";
-    std::string path6 = "./song/1530243258.wav";
-    std::string path7 = "./song/1530243263.wav";
-    std::string path8 = "./song/1530243284.wav";
-
+//    std::string path1 = "./song/z.wav";
+//    std::string path2 = "./song/2.wav";
+//    std::string path3 = "./song/1530242944.wav";
+//    std::string path4= "./song/1530243052.wav";
+//    std::string path5 = "./song/1530243158.wav";
+//    std::string path6 = "./song/1530243258.wav";
+//    std::string path7 = "./song/1530243263.wav";
+//    std::string path8 = "./song/1530243284.wav";
+//    std::string path1 = "./song/pcm/.pcm";
+//    std::string path2 = "./song/pcm/2.pcm";
+    std::string path3 = "./song/pcm/1530242944.pcm";
+    std::string path4 = "./song/pcm/1530243052.pcm";
+    std::string path5 = "./song/pcm/1530243158.pcm";
+    std::string path6 = "./song/pcm/1530243258.pcm";
+    std::string path7 = "./song/pcm/1530243263.pcm";
+    std::string path8 = "./song/pcm/1530243284.pcm";
 //    struct timeval tv;
 //    struct timeval tv2;
 //    gettimeofday(&tv, NULL);
     clock_t startTime, endTime;
     std::vector<std::string> path;
-    path.push_back(path1);
-    path.push_back(path2);
+    path.clear();
+//    path.push_back(path1);
+//    path.push_back(path2);
     path.push_back(path3);
     path.push_back(path4);
     path.push_back(path5);
     path.push_back(path6);
     path.push_back(path7);
     path.push_back(path8);
-    std::cout << sim_distance(path1, path2, path3) << std::endl;
+
+//    for (int i = 0; i < path.size(); ++i) {
+//        for (int j = i+1; j < path.size(); ++j) {
+            startTime = clock();
+//            std::cout << "i:" << i << "  j:" << j << endl;
+//            std::cout << "pi:" << path[i] << "  pj:" << path[j] << endl;
+//            std::cout << sim_distance(path[i], path[j]) << std::endl;
+    std::cout << sim_distance(path7, path8) << std::endl;
+            endTime = clock();
+            std::cout << "  Total Time : " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//            std::cout << "********************" <<std::endl;
+//        }
+//    }
+//    std::cout << sim_distance(path3, path6) << std::endl;
 //    for (int i = 0; i < path.size(); ++i) {
 //        startTime = clock();
 //        std::cout << sim_distance(path1, path2, path[i]) << std::endl;
@@ -360,5 +400,50 @@ int main() {
 //    std::cout << sim_distance(path1, path2, path3) << std::endl;
 //    std::cout << sim_distance(path1, path2, path3) << std::endl;
 
+//    short *data = (short *)malloc(409600);
+//    float *dataf = (float *)malloc(409600);
+//
+//    SF_INFO sf_info;
+//    SNDFILE *snd_file;
+//    sf_info.format = 0;
+//    snd_file = sf_open(path3.c_str(), SFM_READ, &sf_info);
+//    cout << sf_info.samplerate << endl;
+//    cout << sf_info.channels << endl;
+//    cout << sf_info.sections << endl;
+//    cout << sf_info.frames << endl;
+//
+//    cout << sf_read_float(snd_file, dataf, sf_info.frames) << endl;
+//
+//
+//    for (int i = 0; i < sf_info.frames; ++i) {
+//        cout << *dataf++ << endl;
+//    }
+//    int input_len = 10;
+//    float *in = (float *)malloc(input_len*sizeof(float));
+//    SRC_DATA data;
+////    float *out = (float *)malloc(input_len*ceil(data.src_ratio));
+//    float *out = (float *)malloc(input_len*10*sizeof(float));
+//    data.src_ratio = SAMPLERATE / ORRSAMPLE;
+//    in[0] = -0.001;
+//    in[1] = 0.002;
+//    in[2] = 0.003;
+//    in[3] = -0.004;
+//    in[4] = 0.005;
+//    in[5] = -0.006;
+//    in[6] = 0.007;
+//    in[7] = -0.008;
+//    in[8] = -0.009;
+//    in[9] = 0.0001;
+//    data.input_frames = input_len;
+//    data.output_frames = input_len*ceil(data.src_ratio);
+//    data.data_in = in;
+//    data.data_out = out;
+//    if(src_simple(&data, SRC_SINC_BEST_QUALITY, 1)){
+//        std::cout << "src_simple failed" << std::endl;
+//    }
+//    cout << " output num  " << data.output_frames_gen << endl;
+//    for (int j = 0; j < data.output_frames_gen; ++j) {
+//        cout << out[j] << endl;
+//    }
     return 0;
 }

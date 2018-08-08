@@ -10,6 +10,8 @@ static void SortRows(const Eigen::MatrixXf &input, int n, int *output, int m, in
 static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
 //static void SortCols(const Eigen::MatrixXf &input, int *output, int rows, int cols, int col);
 static void SortCols2(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int row);
+static void SortRowsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
+                          int first, int last, int rows);
 
 Eigen::MatrixXi FFT_FRE(1, 1025);
 
@@ -31,12 +33,15 @@ Eigen::MatrixXi argsort(const Eigen::MatrixXf &input, int type){
 //        }
 //        std::cout << std::endl;
 //        std::cout << output << std::endl;
+        int *temp = new int[rows+1];
         for (int i = 0; i < cols; ++i) {
 //            int *id = output.data();
 //            Sort(input, cols, id, cols, i);
 //            SortCols(input, output.data()+i, rows, cols, i);
-            SortRows2(input, rows, output.data()+i*rows, rows, i);
+//            SortRows2(input, rows, output.data()+i*rows, rows, i);
+            SortRowsMerge(input, output.data()+i*rows, temp, 0, rows-1, i);
         }
+        delete []temp;
 
     } else{      //按行
         for (int i = 0; i < rows; ++i) {
@@ -94,8 +99,44 @@ void SortOr(int a[], int n, int id[], int m) {
     }
 }
 
+static void merge(const Eigen::MatrixXf &input, int first, int mid,
+                  int last, int *output, int *temp, int rows){
+    int i = first;
+    int j = mid+1;
+    int m = mid;
+    int n = last;
+    int k = 0;
+
+    while (i <= m && j <= n){
+        if(input(output[i], rows) <= input(output[j], rows))
+            temp[k++] = output[i++];
+        else
+            temp[k++] = output[j++];
+    }
+    while(i <= m)
+        temp[k++] = output[i++];
+    while(j <= n)
+        temp[k++] = output[j++];
+    for (int i = 0; i < k; ++i) {
+        output[first+i] = temp[i];
+    }
+
+}
+
+//merge sort
+//TODO:考虑不传整个矩阵只传部分
+static void SortRowsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
+                          int first, int last, int rows) {
+    if(first < last){
+        int mid = (first + last) / 2;
+        SortRowsMerge(input, output, temp, first, mid, rows);
+        SortRowsMerge(input, output, temp, mid+1, last, rows);
+        merge(input, first, mid, last, output, temp, rows);
+    }
+}
+
+//FIXME::n是多余的
 //因为Matrix的矩阵数据是按列存储的,所以在排序计算索引时时使用不同的算法，按列时使用递归的快排
-//按列,选择排序,对应与存储按列
 static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, int row) {
     if (m > 1) {
         int i = 0;
@@ -198,7 +239,7 @@ std::vector<std::pair<int, int> > getidx(const Eigen::MatrixXf &input, int type,
     if(type){
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                if(input(i,j) < thres){
+                if(input(i,j) <= thres){
                     result.push_back(std::make_pair(i, j));
                 }
             }
@@ -206,7 +247,7 @@ std::vector<std::pair<int, int> > getidx(const Eigen::MatrixXf &input, int type,
     } else{
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                if(input(i,j) > thres){
+                if(input(i,j) >= thres){
                     result.push_back(std::make_pair(i, j));
                 }
             }
@@ -352,4 +393,5 @@ void frequencyInit(){
             20994,21016,21037,21059,21081,21102,21124,21145,21167,21188,21210,21231,21253,21274,21296,21317,21339,21360,
             21382,21404,21425,21447,21468,21490,21511,21533,21554,21576,21597,21619,21640,21662,21683,21705,21727,21748,
             21770,21791,21813,21834,21856,21877,21899,21920,21942,21963,21985,22006,22028,22050;
+    IF_INIT = 1;
 }

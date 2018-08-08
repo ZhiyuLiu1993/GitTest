@@ -12,7 +12,8 @@
 float sim_distance(std::string path1, std::string path2, std::string path3);
 ////这个函数在另一个文件中定义
 //Eigen::MatrixXf feature_decoding(Eigen::MatrixXf s);
+float sim_distance(std::string path1, std::string path2);
 
-float degree(float a);
+double degree(double a);
 
 #endif //SONGCOMPARE_COMPARING_H
