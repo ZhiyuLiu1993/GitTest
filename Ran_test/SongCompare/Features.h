@@ -42,20 +42,19 @@ const int HOPSIZE = 512;
 const float SAMPLERATE = 44100.0;
 const float ORRSAMPLE = 16000.0;
 
+const int MAXBUFFLEN = 400000;
+const int RATIOSIZE = 3;
+
 enum {GREATE = 0, SMALL = 1};
 
 //欧氏距离
-int euclideanDistance(const std::vector<int> &s1, const std::vector<int> &s2);
 float euclideanDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2);
 //汉明距离
-int hammingDistance(const std::vector<int> &s1, const std::vector<int> &s2);
 int hammingDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2);
 //编辑距离
-int editDistance(const std::vector<int> &s1, const std::vector<int> &s2);
 int editDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2);
 
 //将特征进行编码
-std::vector<int> featureDecoding(const std::vector<float> &input);
 Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input);
 
 //  特征处理模块的函数
@@ -64,11 +63,14 @@ Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2);
 
 Eigen::MatrixXf features(std::string path3);
 Eigen::MatrixXf features_buffer(std::string path3);
+Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float cmp_length);
 
 //获取stft后的矩阵
 static void stft(std::string path, Eigen::MatrixXf &out);
 static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out);
 
 static void readFile(std::string path, std::vector<Real> &audio);
+
+void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio);
 
 #endif //SONGCOMPARE_FEATURES_H

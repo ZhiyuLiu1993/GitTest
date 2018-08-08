@@ -6,18 +6,6 @@
 #include <samplerate.h>
 #include "Features.h"
 
-int euclideanDistance(const std::vector<int> &s1, const std::vector<int> &s2){
-    int distance = 0;
-    int length = s1.size() > s2.size() ? s2.size() : s1.size();
-    for (int i = 0; i < length; ++i) {
-        if(s1[i] == s2[i])
-            continue;
-        else
-            distance += abs(s1[i] - s2[i]);
-    }
-    return distance;
-}
-
 float euclideanDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
     int distance = 0;
     int tmp;
@@ -38,18 +26,6 @@ float euclideanDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
     return distance;
 }
 
-int hammingDistance(const std::vector<int> &s1, const std::vector<int> &s2){
-    int distance = 0;
-    int length = s1.size() > s2.size() ? s2.size() : s1.size();
-    for (int i = 0; i < length; ++i) {
-        if(s1[i] != s2[i])
-            distance += 1;
-        else
-            continue;
-    }
-    return distance;
-}
-
 int hammingDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
     int distance = 0;
     int length = s1.size() > s2.size() ? s2.size() : s1.size();
@@ -62,81 +38,6 @@ int hammingDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
             distance += 1;
     }
     return distance;
-}
-
-int editDistance(const std::vector<int> &s1, const std::vector<int> &s2){
-
-    int n = s1.size();
-    int m = s2.size();
-    if (m == 0) return n;
-    if (n == 0) return m;
-    //Construct a matrix
-    typedef std::vector<std::vector<int> >  Tmatrix;
-    Tmatrix matrix(n + 1);
-    for (int i = 0; i <= n; i++)  matrix[i].resize(m + 1);
-
-    //step 2 Initialize
-
-    for (int i = 1; i <= n; i++) matrix[i][0] = i;
-    for (int i = 1; i <= m; i++) matrix[0][i] = i;
-
-    //step 3
-    for (int i = 1; i <= n; i++)
-    {
-        int si = s1[i - 1];
-        //step 4
-        for (int j = 1; j <= m; j++)
-        {
-
-            int sj = s2[j - 1];
-            //step 5
-            int cost = 0;
-            if (si == sj){
-                cost = 0;
-            }
-            else{
-                cost = 1;
-            }
-            //step 6
-            const int above = matrix[i - 1][j] + 1;
-            const int left = matrix[i][j - 1] + 1;
-            const int diag = matrix[i - 1][j - 1] + cost;
-            matrix[i][j] = std::min(above, std::min(left, diag));
-
-        }
-    }//step7
-    return matrix[n][m];
-
-//    unsigned int s1_size = s1.size();
-//    unsigned int s2_size = s2.size();
-//
-//    std::vector<std::vector<int>> mat(s1_size+1);
-//    for (int i = 0; i < s1_size+1; ++i) {
-//        mat[i].resize(s2_size+1);
-//    }
-//    for (int i = 1; i < s1_size+1; ++i) {
-//        mat[i][0] = i;
-//    }
-//    for (int i = 1; i < s2_size+1; ++i) {
-//        mat[0][i] = i;
-//    }
-//
-//    int distance = 0;
-//    int temp = 0;
-//
-//    for (int i = 1; i < s1_size+1; ++i) {
-//        for (int j = 1; j < s2_size+1; ++j) {
-//            if(s1[i-1] == s2[j-1])
-//                distance = 0;
-//            else
-//                distance = 1;
-//
-//            temp = std::min(mat[i-1][j]+1, mat[i][j-1]+1);
-//            mat[i][j] = std::min(temp, mat[i-1][j-1]+distance);
-//        }
-//    }
-//
-//    return mat[s1_size][s2_size];
 }
 
 int editDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
@@ -175,40 +76,9 @@ int editDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
                 matrix[i][j] = 1 + std::min(matrix[i-1][j-1], nm);
             }
 
-//            float sj = data2[j-1];
-//            //step 5
-//            int cost = 0;
-//            if (si-sj<MIN_THR && sj-si<MIN_THR){
-//                cost = 0;
-//            }
-//            else{
-//                cost = 1;
-//            }
-//            //step 6
-//            const int above = matrix[i - 1][j] + 1;
-//            const int left = matrix[i][j - 1] + 1;
-//            const int diag = matrix[i - 1][j - 1] + cost;
-//            matrix[i][j] = std::min(above, std::min(left, diag));
         }
     }//step7
     return matrix[n][m];
-}
-
-std::vector<int> featureDecoding(const std::vector<float> &input){
-    std::vector<int> result;
-    float base = input[0];
-    result.push_back(0);
-    for (int i = 1; i < input.size(); ++i) {
-        if(input[i] > base){
-            result.push_back(1);
-        } else if(input[i] < base){
-            result.push_back(-1);
-        } else  if(input[i]-base<MIN_THR || base-input[i]<MIN_THR){
-            result.push_back(0);
-        }
-        base = input[i];
-    }
-    return result;
 }
 
 Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input){
@@ -234,119 +104,29 @@ Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input){
 Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2){
     if(!IF_INIT)
         frequencyInit();
-        //path1的矩阵
+    //path1的矩阵
     Eigen::MatrixXf out1(MATRIX_ROW, MATRIX_COL);
 
     std::vector<Real> audio;
     readFile(path1, audio);
     stft(audio, out1);
 
-#if 0
-    {
-        std::fstream fout;
-        fout.open("./result/stft_out1.txt", std::ios::out);
-        fout.setf(std::ios::left);
-//        fout.width(20);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < out1.rows(); ++k) {
-            for (int i = 0; i < out1.cols(); ++i) {
-                fout << out1(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
 
-
-//    std::cout << "rows: " << out1.rows() << "cols: " << out1.cols() << std::endl;
-//    std::cout << "*************1end***************" << std::endl;
     //path2的矩阵
 //    Eigen::MatrixXf out2(MATRIX_ROW, MATRIX_COL);
     Eigen::MatrixXf out2;
     readFile(path2, audio);
     stft(audio, out2);
-//    stft(path2, out2);
-//    std::cout << "************2end****************" << std::endl;
-//    assert(out1.rows()==out2.rows() && out1.cols()==out2.cols());
-#if 0
-    {
-        std::fstream fout("./result/stft_out2.txt", std::ios::out);
-//        fout.width(20);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < out2.rows(); ++k) {
-            for (int i = 0; i < out2.cols(); ++i) {
-                fout << out2(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
+
 
     //TODO:考虑少用几个复制的矩阵
     Eigen::MatrixXf output = out1 - TIMES*out2;
-#if FILEP
-    {
-        std::fstream fout("./result/stft_1.txt", std::ios::out);
-//        fout.width(20);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < output.rows(); ++k) {
-            for (int i = 0; i < output.cols(); ++i) {
-                fout << std::setw(15) << output(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
 
-//    std::cout << "rows: " << output.rows() << "cols: " << output.cols() << std::endl;
-//    sleep(10);
-//    std::cout << output << std::endl;
     output = ampliTudeToDb(output);
-
-#if INFILE
-    {
-        output.resize(980, 1025);
-        std::ifstream fi("./result/ampltitude.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                output(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-    }
-#endif
-
-//    std::cout << output << std::endl;
 
     std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_ORI_DB);
     setidx(output, idx, SET_MIN_DB);
-#if FILEP
-    {
-        std::fstream fout("./result/amlit_out.txt", std::ios::out);
-//        fout.setf(std::ios::left);
-        for (int k = 0; k < output.rows(); ++k) {
-            for (int i = 0; i < output.cols(); ++i) {
-//                fout << std::setw(10) << output(k, i) << " ";
-                fout << output(k, i) << ",";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
+
     //FIXME::#########################################
 //    Eigen::MatrixXi mat_index = argsort(output, 1);
 #if 1
@@ -355,43 +135,7 @@ Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2){
 //    mat_index.transposeInPlace();
 #endif
 //    mat_index.transposeInPlace();
-#if FILEP
-    {
-        std::fstream fout("./result/mat_index.txt", std::ios::out);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < mat_index.rows(); ++k) {
-            for (int i = 0; i < mat_index.cols(); ++i) {
-                fout << std::setw(6) << mat_index(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
-#if INFILE
-    {
-        mat_index.resize(980, 1025);
-        std::ifstream fi("./result/index.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                mat_index(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-        mat_index.transposeInPlace();
-//    std::cout << i << "   " << j << std::endl;
-    }
-#endif
+
 
     int cur_col = mat_index.cols();
 //    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
@@ -413,19 +157,6 @@ Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2){
 //    std::cout << result.rows() << "   " << result.cols() << std::endl;
     idx = getidx(result, GREATE, MAX_DB);
     setidx(result, idx, 0);
-#if FILEP
-    {
-        std::fstream fout("./result/feature.txt", std::ios::out);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < result.rows(); ++k) {
-            for (int i = 0; i < result.cols(); ++i) {
-                fout << std::setw(8) << result(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
 
     return result;
 }
@@ -437,110 +168,21 @@ Eigen::MatrixXf original_music(std::string path1, std::string path2){
     Eigen::MatrixXf out1(MATRIX_ROW, MATRIX_COL);
     stft(path1, out1);
 
-#if 0
-    {
-        std::fstream fout;
-        fout.open("./result/stft_out1.txt", std::ios::out);
-        fout.setf(std::ios::left);
-//        fout.width(20);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < out1.rows(); ++k) {
-            for (int i = 0; i < out1.cols(); ++i) {
-                fout << out1(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
-
-
-//    std::cout << "rows: " << out1.rows() << "cols: " << out1.cols() << std::endl;
-//    std::cout << "*************1end***************" << std::endl;
     //path2的矩阵
 //    Eigen::MatrixXf out2(MATRIX_ROW, MATRIX_COL);
     Eigen::MatrixXf out2;
     stft(path2, out2);
-//    std::cout << "************2end****************" << std::endl;
 //    assert(out1.rows()==out2.rows() && out1.cols()==out2.cols());
-#if 0
-    {
-        std::fstream fout("./result/stft_out2.txt", std::ios::out);
-//        fout.width(20);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < out2.rows(); ++k) {
-            for (int i = 0; i < out2.cols(); ++i) {
-                fout << out2(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
 
     //TODO:考虑少用几个复制的矩阵
     Eigen::MatrixXf output = out1 - TIMES*out2;
-#if FILEP
-    {
-        std::fstream fout("./result/stft_1.txt", std::ios::out);
-//        fout.width(20);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < output.rows(); ++k) {
-            for (int i = 0; i < output.cols(); ++i) {
-                fout << std::setw(15) << output(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
 
-//    std::cout << "rows: " << output.rows() << "cols: " << output.cols() << std::endl;
-//    sleep(10);
-//    std::cout << output << std::endl;
     output = ampliTudeToDb(output);
 
-#if INFILE
-    {
-        output.resize(980, 1025);
-        std::ifstream fi("./result/ampltitude.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                output(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-    }
-#endif
-
-//    std::cout << output << std::endl;
 
     std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_ORI_DB);
     setidx(output, idx, SET_MIN_DB);
-#if FILEP
-    {
-        std::fstream fout("./result/amlit_out.txt", std::ios::out);
-//        fout.setf(std::ios::left);
-        for (int k = 0; k < output.rows(); ++k) {
-            for (int i = 0; i < output.cols(); ++i) {
-//                fout << std::setw(10) << output(k, i) << " ";
-                fout << output(k, i) << ",";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
+
     //FIXME::#########################################
 //    Eigen::MatrixXi mat_index = argsort(output, 1);
 #if 1
@@ -549,43 +191,7 @@ Eigen::MatrixXf original_music(std::string path1, std::string path2){
 //    mat_index.transposeInPlace();
 #endif
 //    mat_index.transposeInPlace();
-#if FILEP
-    {
-        std::fstream fout("./result/mat_index.txt", std::ios::out);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < mat_index.rows(); ++k) {
-            for (int i = 0; i < mat_index.cols(); ++i) {
-                fout << std::setw(6) << mat_index(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
-#if INFILE
-    {
-        mat_index.resize(980, 1025);
-        std::ifstream fi("./result/index.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                mat_index(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-        mat_index.transposeInPlace();
-//    std::cout << i << "   " << j << std::endl;
-    }
-#endif
+
 
     int cur_col = mat_index.cols();
 //    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
@@ -607,25 +213,12 @@ Eigen::MatrixXf original_music(std::string path1, std::string path2){
 //    std::cout << result.rows() << "   " << result.cols() << std::endl;
     idx = getidx(result, GREATE, MAX_DB);
     setidx(result, idx, 0);
-#if FILEP
-    {
-        std::fstream fout("./result/feature.txt", std::ios::out);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < result.rows(); ++k) {
-            for (int i = 0; i < result.cols(); ++i) {
-                fout << std::setw(8) << result(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
 
     return result;
 }
 
 Eigen::MatrixXf features_buffer(std::string path3){
-     if(!IF_INIT)
+    if(!IF_INIT)
         frequencyInit();
     Eigen::MatrixXf output;
     std::vector<Real> audio;
@@ -634,88 +227,16 @@ Eigen::MatrixXf features_buffer(std::string path3){
 //    stft(path3, output);
     output = ampliTudeToDb(output);
 //    std::cout << output.rows() << "   " << output.cols() << std::endl;
- #if INFILE
-    {
-        output.resize(951, 1025);
-        std::ifstream fi("./result/path3_amplititude.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                output(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-//    std::cout << i << "   " << j << std::endl;
-    }
-#endif
+
     std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
     setidx(output, idx, SET_MIN_DB);
-#if FILEP
-    {
-        std::fstream fout("./result/amlit_out1.txt", std::ios::out);
-//        fout.setf(std::ios::left);
-        for (int k = 0; k < output.rows(); ++k) {
-            for (int i = 0; i < output.cols(); ++i) {
-//                fout << std::setw(10) << output(k, i) << " ";
-                fout << output(k, i) << ",";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
+
 //    Eigen::MatrixXi mat_index = argsort(output, 1);
 //    mat_index.transposeInPlace();
 #if 1
     output.transposeInPlace();
     Eigen::MatrixXi mat_index = argsort(output, 0);
 //    mat_index.transposeInPlace();
-#endif
-#if FILEP
-    {
-        std::fstream fout("./result/mat_index1.txt", std::ios::out);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < mat_index.rows(); ++k) {
-            for (int i = 0; i < mat_index.cols(); ++i) {
-                fout << std::setw(6) << mat_index(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
-#if INFILE
-    {
-        mat_index.resize(951, 1025);
-        std::ifstream fi("./result/path3_amplititude_index.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                mat_index(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-        mat_index.transposeInPlace();
-//    std::cout << i << "   " << j << std::endl;
-    }
 #endif
 
     int cur_col = mat_index.cols();
@@ -745,88 +266,16 @@ Eigen::MatrixXf features(std::string path3){
     stft(path3, output);
     output = ampliTudeToDb(output);
 //    std::cout << output.rows() << "   " << output.cols() << std::endl;
- #if INFILE
-    {
-        output.resize(951, 1025);
-        std::ifstream fi("./result/path3_amplititude.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                output(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-//    std::cout << i << "   " << j << std::endl;
-    }
-#endif
+
     std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
     setidx(output, idx, SET_MIN_DB);
-#if FILEP
-    {
-        std::fstream fout("./result/amlit_out1.txt", std::ios::out);
-//        fout.setf(std::ios::left);
-        for (int k = 0; k < output.rows(); ++k) {
-            for (int i = 0; i < output.cols(); ++i) {
-//                fout << std::setw(10) << output(k, i) << " ";
-                fout << output(k, i) << ",";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
+
 //    Eigen::MatrixXi mat_index = argsort(output, 1);
 //    mat_index.transposeInPlace();
 #if 1
     output.transposeInPlace();
     Eigen::MatrixXi mat_index = argsort(output, 0);
 //    mat_index.transposeInPlace();
-#endif
-#if FILEP
-    {
-        std::fstream fout("./result/mat_index1.txt", std::ios::out);
-        fout.setf(std::ios::left);
-        for (int k = 0; k < mat_index.rows(); ++k) {
-            for (int i = 0; i < mat_index.cols(); ++i) {
-                fout << std::setw(6) << mat_index(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
-#if INFILE
-    {
-        mat_index.resize(951, 1025);
-        std::ifstream fi("./result/path3_amplititude_index.csv");
-        std::string                line;
-        int i = 0;
-        int j = 0;
-        while (getline(fi, line))
-        {
-            std::stringstream          lineStream(line);
-            std::string                cell;
-            j = 0;
-            while (std::getline(lineStream, cell, ' '))
-            {
-                mat_index(i, j++) = atoi(cell.c_str());
-//                std::cout << cell << " ";
-            }
-//            std::cout << std::endl;
-            ++i;
-        }
-        mat_index.transposeInPlace();
-//    std::cout << i << "   " << j << std::endl;
-    }
 #endif
 
     int cur_col = mat_index.cols();
@@ -1134,4 +583,82 @@ static void readFile(std::string path, std::vector<Real> &audio){
     free(buffer);
     free(in);
     free(out);
+}
+
+void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio){
+    audio.clear();
+
+    //使用静态分配的内存，看是否比动态分配的速度快
+    static float in[MAXBUFFLEN];
+    static float out[RATIOSIZE*MAXBUFFLEN];
+    memset(in, 0, sizeof(float)*MAXBUFFLEN);
+    memset(out, 0, sizeof(float)*MAXBUFFLEN*RATIOSIZE);
+    SRC_DATA data;
+    data.src_ratio = SAMPLERATE / ORRSAMPLE;
+    for (int j = 0; j < len/2; ++j) {
+        char bl = buffer[2*j];
+        char bh = buffer[2*j+1];
+
+        short s = (short)((bh & 0x00FF) << 8 | bl & 0x00FF);
+        float ft = s / 32768.0;
+        in[j] = ft;
+//        std::cout << f << std::endl;
+    }
+    data.input_frames = MAXBUFFLEN;
+    data.output_frames = MAXBUFFLEN*RATIOSIZE;
+    data.data_in = in;
+    data.data_out = out;
+    int error;
+    if(error = src_simple(&data, SRC_SINC_FASTEST, 1)){
+        std::cout << src_strerror(error) << std::endl;
+    }
+
+    for (int i = 0; i < data.output_frames_gen; ++i) {
+        audio.push_back(out[i]);
+    }
+}
+
+Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float cmp_length){
+    if(!IF_INIT)
+        frequencyInit();
+
+    Eigen::MatrixXf output;
+    std::vector<Real> audio;
+
+    bufferToFloat(org_buffer, org_len*cmp_length, audio);
+
+    stft(audio, output);
+//    stft(path3, output);
+    output = ampliTudeToDb(output);
+//    std::cout << output.rows() << "   " << output.cols() << std::endl;
+
+    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
+    setidx(output, idx, SET_MIN_DB);
+
+//    Eigen::MatrixXi mat_index = argsort(output, 1);
+//    mat_index.transposeInPlace();
+#if 1
+    output.transposeInPlace();
+    Eigen::MatrixXi mat_index = argsort(output, 0);
+//    mat_index.transposeInPlace();
+#endif
+
+    int cur_col = mat_index.cols();
+//    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
+//    std::cout << MATRIX_COL-MATRIX_RANGE << std::endl;
+    Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
+    int index;
+    for (int i = MATRIX_COL-MATRIX_RANGE; i < MATRIX_COL; ++i) {
+        for (int j = 0; j < cur_col; ++j) {
+            //从FFT_FRE中获取对应排序索引的频率,目前取最大的6列，即最后6列
+            index = mat_index(i, j);
+            result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
+        }
+    }
+
+    idx = getidx(result, GREATE, MAX_DB);
+    setidx(result, idx, 0);
+
+
+    return result;
 }

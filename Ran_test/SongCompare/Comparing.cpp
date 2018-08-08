@@ -47,37 +47,7 @@ static float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2)
             f2(i, j) = tmp(0, j);
         }
     }
-#if FILEP
-    {
-        std::fstream fout;
-        fout.setf(std::ios::left);
-        fout.open("./result/feature_code.txt", std::ios::out);
-        for (int k = 0; k < f1.rows(); ++k) {
-            for (int i = 0; i < f1.cols(); ++i) {
-                fout << std::setw(3) << f1(k, i) << " ";
-            }
-            fout << std::endl;
-            for (int i = 0; i < f2.cols(); ++i) {
-                fout << std::setw(3) << f2(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
-#if 0
-    {
-        std::fstream fout;
-        fout.open("./result/feature_code2.txt", std::ios::out);
-        for (int k = 0; k < f2.rows(); ++k) {
-            for (int i = 0; i < f2.cols(); ++i) {
-                fout << f2(k, i) << ",";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
+
     //  定义距离结果
     double res1[6], res2[6], res3[6];
     //  定义距离之和
@@ -177,15 +147,6 @@ float sim_distance(std::string path1, std::string path2) {
 
 //  相似度计算仿射函数，解决if嵌套
 double degree(double a){
-//    if (0 <= a <= 0.10) return 0.95 + (0.05 * (0.10 - a));
-//    if (0.10 < a <= 0.15) return 0.90 + (0.05 * (0.15 - a));
-//    if (0.15 < a <= 0.20) return 0.85 + (0.05 * (0.20 - a));
-//    if (0.20 < a <= 0.25) return 0.75 + (0.10 * (0.25 - a));
-//    if (0.25 < a <= 0.30) return 0.60 + (0.15 * (0.30 - a));
-//    if (0.30 < a <= 0.35) return 0.45 + (0.15 * (0.35 - a));
-//    if (0.35 < a <= 0.40) return 0.30 + (0.15 * (0.40 - a));
-//    if (0.40 < a <= 0.45) return 0.20 + (0.10 * (0.45 - a));
-//    if (0.45 < a <= 1.0) return (0.20 * (a - 0.45));
     if (0.0 <= a && a <= 0.10) return 0.95 + ((0.1 - a) / 2);
     if (0.10 < a && a <= 0.15) return 0.90 + (0.05 * (0.15 - a) / 0.05);
     if (0.15 < a && a <= 0.20) return 0.85 + (0.05 * (0.20 - a) / 0.05);
@@ -195,4 +156,13 @@ double degree(double a){
     if (0.35 < a && a <= 0.40) return 0.30 + (0.15 * (0.40 - a) / 0.05);
     if (0.40 < a && a <= 0.45) return 0.20 + (0.10 * (0.45 - a) / 0.05);
     if (0.45 < a && a <= 1.0) return (0.20 * (1.0 - a) / 0.55);
+}
+
+float sim_distance(const char *org_buffer, unsigned int org_len,
+                   const char *test_buffer, unsigned int test_len,
+                   float cmp_length){
+    Eigen::MatrixXf feature1 = features_buffer(org_buffer, org_len, cmp_length);
+    Eigen::MatrixXf feature2 = features_buffer(test_buffer, test_len, cmp_length);
+
+    return computeDegree(feature1, feature2);
 }
