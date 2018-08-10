@@ -297,7 +297,6 @@ Eigen::MatrixXf powerToDb(const Eigen::MatrixXf &input, float ref, float amin, f
 
     Eigen::MatrixXf log_spec = maximum(amin, input);
 
-    //TODO:此处没有将矩阵求对数进行封装，之后考虑
     int length = log_spec.size();
     float *data = log_spec.data();
     for (int i = 0; i < length; ++i) {

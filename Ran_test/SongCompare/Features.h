@@ -20,7 +20,7 @@ using namespace essentia;
 using namespace standard;
 
 //开始计算距离的起始位置
-const int START_INDEX = 220;
+const int START_INDEX = 0;
 //原唱与伴奏之间的差距
 const float TIMES = 1.4;
 

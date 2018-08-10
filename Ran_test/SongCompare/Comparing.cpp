@@ -5,30 +5,9 @@
 #include <iomanip>
 #include "Comparing.h"
 
+//static clock_t startTime, endTime;
 
 static float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2){
-#if FILEP
-    {
-        std::fstream fout;
-        fout.setf(std::ios::left);
-        fout.open("./result/feature.txt", std::ios::out);
-        for (int k = 0; k < feature1.rows(); ++k) {
-            for (int i = 0; i < feature1.cols(); ++i) {
-                fout << std::setw(3) << feature1(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout << std::endl;
-        fout << std::endl;
-        for (int k = 0; k < feature2.rows(); ++k) {
-            for (int i = 0; i < feature2.cols(); ++i) {
-                fout << std::setw(3) << feature2(k, i) << " ";
-            }
-            fout << std::endl;
-        }
-        fout.close();
-    };
-#endif
     //  定义编码序列
     Eigen::MatrixXi f1(feature1.rows(), feature1.cols());
     Eigen::MatrixXi f2(feature2.rows(), feature2.cols());
@@ -161,7 +140,10 @@ double degree(double a){
 float sim_distance(const char *org_buffer, unsigned int org_len,
                    const char *test_buffer, unsigned int test_len,
                    float cmp_length){
+//    startTime = clock();
     Eigen::MatrixXf feature1 = features_buffer(org_buffer, org_len, cmp_length);
+//    endTime = clock();
+//    std::cout << "feature_buffer Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     Eigen::MatrixXf feature2 = features_buffer(test_buffer, test_len, cmp_length);
 
     return computeDegree(feature1, feature2);

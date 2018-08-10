@@ -36,7 +36,7 @@ static void readFile(std::string path, char **buffer, unsigned int &buf_len){
     buf_len = len;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     //####1
 //    s1.push_back(3);
 //    s1.push_back(4);
@@ -371,13 +371,13 @@ int main() {
 //    std::string path8 = "./song/1530243284.wav";
 //    std::string path1 = "./song/pcm/.pcm";
 //    std::string path2 = "./song/pcm/2.pcm";
-    std::string path3 = "./song/pcm/1530242944.pcm";
-    std::string path4 = "./song/pcm/1530243052.pcm";
-    std::string path5 = "./song/pcm/1530243158.pcm";
-    std::string path6 = "./song/pcm/1530243258.pcm";
-    std::string path7 = "./song/pcm/1530243263.pcm";
-    std::string path8 = "./song/pcm/1530243284.pcm";
-    std::string path9 = "./song/pcm/1530243436.pcm";
+    std::string path0 = "./song/pcm/1530242944.pcm";
+    std::string path1 = "./song/pcm/1530243052.pcm";
+    std::string path2 = "./song/pcm/1530243158.pcm";
+    std::string path3 = "./song/pcm/1530243258.pcm";
+    std::string path4 = "./song/pcm/1530243263.pcm";
+    std::string path5 = "./song/pcm/1530243284.pcm";
+//    std::string path9 = "./song/pcm/1530243436.pcm";
 //    struct timeval tv;
 //    struct timeval tv2;
 //    gettimeofday(&tv, NULL);
@@ -386,33 +386,46 @@ int main() {
     path.clear();
 //    path.push_back(path1);
 //    path.push_back(path2);
+    path.push_back(path0);
+    path.push_back(path1);
+    path.push_back(path2);
     path.push_back(path3);
     path.push_back(path4);
     path.push_back(path5);
-    path.push_back(path6);
-    path.push_back(path7);
-    path.push_back(path8);
-    path.push_back(path9);
+//    path.push_back(path9);
 
     char *buf1;
     unsigned int len1;
     char *buf2;
     unsigned int len2;
 
-    readFile(path3, &buf1, len1);
-    readFile(path4, &buf2, len2);
+//    if(argc != 4){
+//        cout << "param num error!" << endl;
+//        return -1;
+//    }
+//
+//    int i = atoi(argv[1]);
+//    int j = atoi(argv[2]);
+//    float ratio = atof(argv[3]);
+//    std::cout << "i:" << i << " j:" << j << " ratio:" << ratio << endl;
+
+//    readFile(path[i], &buf1, len1);
+//    readFile(path[j], &buf2, len2);
+    readFile(path0, &buf1, len1);
+    readFile(path1, &buf2, len2);
 
 //    for (int i = 0; i < path.size()-1; ++i) {
 //    for (int i = 0; i < path.size()-1; ++i) {
 //        for (int j = i+1; j < path.size(); ++j) {
     startTime = clock();
-//            std::cout << "i:" << i << "  j:" << j << endl;
 //            std::cout << "pi:" << path[i] << "  pj:" << path[j] << endl;
 //            std::cout << sim_distance(path4, path3) << std::endl;
-    std::cout << sim_distance(buf1, len1, buf2, len2, 0.6) << std::endl;
+//    std::cout << sim_distance(buf1, len1, buf2, len2, ratio) << std::endl;
+    std::cout << sim_distance(buf1, len1, buf2, len2, 1) << std::endl;
 //        std::cout << sim_distance(path9, path9, path[i]) << std::endl;
     endTime = clock();
-    std::cout << "  Total Time : " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    std::cout << "Total Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    std::cout << "-----------------------------------------------------------" << endl;
 
     return 0;
 }

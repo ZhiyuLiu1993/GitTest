@@ -6,6 +6,8 @@
 #include <samplerate.h>
 #include "Features.h"
 
+//static clock_t startTime, endTime;
+
 float euclideanDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
     int distance = 0;
     int tmp;
@@ -83,7 +85,7 @@ int editDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
 
 Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input){
     Eigen::MatrixXi result;
-    result.resize(1,input.size());
+    result.resize(1, input.size());
     const  float *data = input.data();
     float base = data[0];
     result(0,0) = 0;
@@ -537,7 +539,6 @@ static void stft(std::string path, Eigen::MatrixXf &out){
     }
 }
 
-//FIXME::此处buffer类型还需要验证
 static void readFile(std::string path, std::vector<Real> &audio){
     audio.clear();
 
@@ -595,13 +596,13 @@ void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audi
     memset(out, 0, sizeof(float)*MAXBUFFLEN*RATIOSIZE);
     SRC_DATA data;
     data.src_ratio = SAMPLERATE / ORRSAMPLE;
-    for (int j = 0; j < len/2; ++j) {
+    for (int j = 20*1025; j < len/2; ++j) {
         char bl = buffer[2*j];
         char bh = buffer[2*j+1];
 
         short s = (short)((bh & 0x00FF) << 8 | bl & 0x00FF);
         float ft = s / 32768.0;
-        in[j] = ft;
+        in[j-20*1025] = ft;
 //        std::cout << f << std::endl;
     }
     data.input_frames = MAXBUFFLEN;
@@ -625,11 +626,20 @@ Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, fl
     Eigen::MatrixXf output;
     std::vector<Real> audio;
 
+//    startTime = clock();
     bufferToFloat(org_buffer, org_len*cmp_length, audio);
+//    endTime = clock();
+//    std::cout << "bufferToFloat Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
+//    startTime = clock();
     stft(audio, output);
+//    endTime = clock();
+//    std::cout << "stft Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    stft(path3, output);
+//    startTime = clock();
     output = ampliTudeToDb(output);
+//    endTime = clock();
+//    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    std::cout << output.rows() << "   " << output.cols() << std::endl;
 
     std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
@@ -638,8 +648,11 @@ Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, fl
 //    Eigen::MatrixXi mat_index = argsort(output, 1);
 //    mat_index.transposeInPlace();
 #if 1
+//    startTime = clock();
     output.transposeInPlace();
     Eigen::MatrixXi mat_index = argsort(output, 0);
+//    endTime = clock();
+//    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    mat_index.transposeInPlace();
 #endif
 

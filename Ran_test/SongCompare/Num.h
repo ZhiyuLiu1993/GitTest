@@ -11,8 +11,7 @@
 
 #include <fstream>
 
-#define FILEP 0
-#define INFILE 0
+#include <sys/time.h>
 
 static int IF_INIT = 0;
 
