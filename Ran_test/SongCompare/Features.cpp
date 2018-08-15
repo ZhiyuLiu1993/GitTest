@@ -317,9 +317,9 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     AlgorithmFactory& factory = AlgorithmFactory::instance();
 
     // audio loader (we always need it...)
-    Algorithm* audioload = factory.create("MonoLoader",
-                                          "sampleRate",sr,
-                                          "downmix","mix");
+//    Algorithm* audioload = factory.create("MonoLoader",
+//                                          "sampleRate",sr,
+//                                          "downmix","mix");
 //    cout << audioload << endl;
 //    std::vector<Real> audio;
 //    for (int j = 0; j < len; ++j) {
@@ -669,8 +669,8 @@ Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, fl
         }
     }
 
-    idx = getidx(result, GREATE, MAX_DB);
-    setidx(result, idx, 0);
+//    idx = getidx(result, GREATE, MAX_DB);
+//    setidx(result, idx, 0);
 
 
     return result;

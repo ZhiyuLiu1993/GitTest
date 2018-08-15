@@ -403,7 +403,7 @@ int main(int argc, char *argv[]) {
 //        cout << "param num error!" << endl;
 //        return -1;
 //    }
-//
+
 //    int i = atoi(argv[1]);
 //    int j = atoi(argv[2]);
 //    float ratio = atof(argv[3]);
@@ -421,7 +421,7 @@ int main(int argc, char *argv[]) {
 //            std::cout << "pi:" << path[i] << "  pj:" << path[j] << endl;
 //            std::cout << sim_distance(path4, path3) << std::endl;
 //    std::cout << sim_distance(buf1, len1, buf2, len2, ratio) << std::endl;
-    std::cout << sim_distance(buf1, len1, buf2, len2, 1) << std::endl;
+    std::cout << sim_distance(buf1, len1, buf2, len2, 0.5) << std::endl;
 //        std::cout << sim_distance(path9, path9, path[i]) << std::endl;
     endTime = clock();
     std::cout << "Total Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
