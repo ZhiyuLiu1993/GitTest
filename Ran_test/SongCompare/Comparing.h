@@ -14,10 +14,9 @@ float sim_distance(const char *org_buffer, unsigned int org_len,
                    const char *test_buffer, unsigned int test_len,
                     float cmp_length = 0.5);
 
-Eigen::MatrixXf features(const char *org_buffer, unsigned int org_len, float pre, float cmp_length);
+Eigen::MatrixXf features(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length);
 
 float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2);
 
-double degree(double a);
 
 #endif //SONGCOMPARE_COMPARING_H

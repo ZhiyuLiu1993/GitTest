@@ -6,6 +6,7 @@
 #include "Comparing.h"
 
 //static clock_t startTime, endTime;
+static double degree(double a);
 
 float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2){
     //  定义编码序列
@@ -96,7 +97,7 @@ float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2){
 }
 
 //  相似度计算仿射函数，解决if嵌套
-double degree(double a){
+static double degree(double a){
     if (0.0 <= a && a <= 0.10) return 0.95 + ((0.1 - a) / 2);
     if (0.10 < a && a <= 0.15) return 0.90 + (0.05 * (0.15 - a) / 0.05);
     if (0.15 < a && a <= 0.20) return 0.85 + (0.05 * (0.20 - a) / 0.05);
@@ -120,6 +121,6 @@ float sim_distance(const char *org_buffer, unsigned int org_len,
     return computeDegree(feature1, feature2);
 }
 
-Eigen::MatrixXf features(const char *org_buffer, unsigned int org_len, float pre, float cmp_length){
-    return features_buffer(org_buffer, org_len, pre, cmp_length);
+Eigen::MatrixXf features(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length){
+    return features_buffer(ori_buffer, ori_len, pre, cmp_length);
 }

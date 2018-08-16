@@ -44,7 +44,7 @@ const float SAMPLERATE = 44100.0;
 const float ORRSAMPLE = 16000.0;
 
 //读取buffer的缓冲区长度
-const int MAXBUFFLEN = 100000;
+const int MAXBUFFLEN = 200000;
 //重采样后缓冲区长度
 const int RESAMBUFFLEN = 2.8 * MAXBUFFLEN;
 
@@ -65,8 +65,8 @@ Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input);
 
 //  特征处理模块的函数
 
-Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float cmp_length);
-Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float pre, float cmp_length);
+Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, float cmp_length);
+Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length);
 
 //获取stft后的矩阵
 static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out);
