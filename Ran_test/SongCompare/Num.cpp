@@ -8,7 +8,6 @@
 
 static void SortRows(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
 static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
-//static void SortCols(const Eigen::MatrixXf &input, int *output, int rows, int cols, int col);
 static void SortCols2(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int row);
 static void SortRowsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
                           int first, int last, int rows);

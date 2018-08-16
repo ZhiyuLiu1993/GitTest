@@ -7,7 +7,7 @@
 
 //static clock_t startTime, endTime;
 
-static float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2){
+float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2){
     //  定义编码序列
     Eigen::MatrixXi f1(feature1.rows(), feature1.cols());
     Eigen::MatrixXi f2(feature2.rows(), feature2.cols());
@@ -95,35 +95,6 @@ static float computeDegree(Eigen::MatrixXf &feature1, Eigen::MatrixXf &feature2)
     return d;
 }
 
-// 计算原唱，伴奏，用户歌声的相似度
-float sim_distance(std::string path1, std::string path2, std::string path3) {
-
-    // 获得原唱特征序列，伴奏特征序列
-//    clock_t startTime, endTime;
-//    startTime = clock();
-    Eigen::MatrixXf feature1 = original_music_buffer(path1, path2);
-//    endTime = clock();
-//    std::cout << "original Time : " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
-    Eigen::MatrixXf feature2 = features_buffer(path3);
-    return computeDegree(feature1, feature2);
-}
-
-float sim_distance(std::string path1, std::string path2) {
-
-    // 获得原唱特征序列，伴奏特征序列
-//    clock_t startTime, endTime;
-//    startTime = clock();
-
-    Eigen::MatrixXf feature1 = features_buffer(path1);
-//    Eigen::MatrixXf feature1 = features(path1);
-//    endTime = clock();
-//    std::cout << "original Time : " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
-    Eigen::MatrixXf feature2 = features_buffer(path2);
-//    Eigen::MatrixXf feature2 = features(path2);
-
-    return computeDegree(feature1, feature2);
-}
-
 //  相似度计算仿射函数，解决if嵌套
 double degree(double a){
     if (0.0 <= a && a <= 0.10) return 0.95 + ((0.1 - a) / 2);
@@ -147,4 +118,8 @@ float sim_distance(const char *org_buffer, unsigned int org_len,
     Eigen::MatrixXf feature2 = features_buffer(test_buffer, test_len, cmp_length);
 
     return computeDegree(feature1, feature2);
+}
+
+Eigen::MatrixXf features(const char *org_buffer, unsigned int org_len, float pre, float cmp_length){
+    return features_buffer(org_buffer, org_len, pre, cmp_length);
 }

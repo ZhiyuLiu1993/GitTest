@@ -39,11 +39,17 @@ const int SET_MIN_DB = -100;
 
 const int FRAMESIZE = 2048;
 const int HOPSIZE = 512;
+//采样率
 const float SAMPLERATE = 44100.0;
 const float ORRSAMPLE = 16000.0;
 
-const int MAXBUFFLEN = 400000;
-const int RATIOSIZE = 3;
+//读取buffer的缓冲区长度
+const int MAXBUFFLEN = 100000;
+//重采样后缓冲区长度
+const int RESAMBUFFLEN = 2.8 * MAXBUFFLEN;
+
+//每一秒帧的buffer长度
+const int FRAMELEN = 8200;
 
 enum {GREATE = 0, SMALL = 1};
 
@@ -58,19 +64,17 @@ int editDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2);
 Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input);
 
 //  特征处理模块的函数
-Eigen::MatrixXf original_music(std::string path1, std::string path2);
-Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2);
 
-Eigen::MatrixXf features(std::string path3);
-Eigen::MatrixXf features_buffer(std::string path3);
 Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float cmp_length);
+Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float pre, float cmp_length);
 
 //获取stft后的矩阵
-static void stft(std::string path, Eigen::MatrixXf &out);
 static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out);
 
 static void readFile(std::string path, std::vector<Real> &audio);
 
 void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio);
+
+void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio, float pre, float cmp_length);
 
 #endif //SONGCOMPARE_FEATURES_H

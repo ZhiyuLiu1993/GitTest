@@ -6,7 +6,7 @@
 #include <samplerate.h>
 #include "Features.h"
 
-//static clock_t startTime, endTime;
+static clock_t startTime, endTime;
 
 float euclideanDistance(const Eigen::MatrixXi &s1, const Eigen::MatrixXi &s2){
     int distance = 0;
@@ -102,204 +102,6 @@ Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input){
     return result;
 }
 
-//FIXME:目前的可能存在内存泄露问题，buffer在不同地方申请与释放
-Eigen::MatrixXf original_music_buffer(std::string path1, std::string path2){
-    if(!IF_INIT)
-        frequencyInit();
-    //path1的矩阵
-    Eigen::MatrixXf out1(MATRIX_ROW, MATRIX_COL);
-
-    std::vector<Real> audio;
-    readFile(path1, audio);
-    stft(audio, out1);
-
-
-    //path2的矩阵
-//    Eigen::MatrixXf out2(MATRIX_ROW, MATRIX_COL);
-    Eigen::MatrixXf out2;
-    readFile(path2, audio);
-    stft(audio, out2);
-
-
-    //TODO:考虑少用几个复制的矩阵
-    Eigen::MatrixXf output = out1 - TIMES*out2;
-
-    output = ampliTudeToDb(output);
-
-    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_ORI_DB);
-    setidx(output, idx, SET_MIN_DB);
-
-    //FIXME::#########################################
-//    Eigen::MatrixXi mat_index = argsort(output, 1);
-#if 1
-    output.transposeInPlace();
-    Eigen::MatrixXi mat_index = argsort(output, 0);
-//    mat_index.transposeInPlace();
-#endif
-//    mat_index.transposeInPlace();
-
-
-    int cur_col = mat_index.cols();
-//    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
-//    std::cout << MATRIX_COL-MATRIX_RANGE << std::endl;
-    Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
-//    std::cout << result.rows() << "   " << result.cols() << std::endl;
-    int index;
-    for (int i = MATRIX_COL-MATRIX_RANGE; i < MATRIX_COL; ++i) {
-        for (int j = 0; j < cur_col; ++j) {
-            //从FFT_FRE中获取对应排序索引的频率,目前取最大的6列，即最后6列
-//            std::cout << " i: "  << i << "  j: " << j << std::endl;
-            index = mat_index(i, j);
-//            std::cout << " index: "  << index << std::endl;
-            result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
-//            std::cout << "result:  " << result(i, j) << std::endl;
-        }
-    }
-
-//    std::cout << result.rows() << "   " << result.cols() << std::endl;
-    idx = getidx(result, GREATE, MAX_DB);
-    setidx(result, idx, 0);
-
-    return result;
-}
-//TODO:与feature函数是相似的，可以考虑再进行一层封装
-Eigen::MatrixXf original_music(std::string path1, std::string path2){
-    if(!IF_INIT)
-        frequencyInit();
-    //path1的矩阵
-    Eigen::MatrixXf out1(MATRIX_ROW, MATRIX_COL);
-    stft(path1, out1);
-
-    //path2的矩阵
-//    Eigen::MatrixXf out2(MATRIX_ROW, MATRIX_COL);
-    Eigen::MatrixXf out2;
-    stft(path2, out2);
-//    assert(out1.rows()==out2.rows() && out1.cols()==out2.cols());
-
-    //TODO:考虑少用几个复制的矩阵
-    Eigen::MatrixXf output = out1 - TIMES*out2;
-
-    output = ampliTudeToDb(output);
-
-
-    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_ORI_DB);
-    setidx(output, idx, SET_MIN_DB);
-
-    //FIXME::#########################################
-//    Eigen::MatrixXi mat_index = argsort(output, 1);
-#if 1
-    output.transposeInPlace();
-    Eigen::MatrixXi mat_index = argsort(output, 0);
-//    mat_index.transposeInPlace();
-#endif
-//    mat_index.transposeInPlace();
-
-
-    int cur_col = mat_index.cols();
-//    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
-//    std::cout << MATRIX_COL-MATRIX_RANGE << std::endl;
-    Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
-//    std::cout << result.rows() << "   " << result.cols() << std::endl;
-    int index;
-    for (int i = MATRIX_COL-MATRIX_RANGE; i < MATRIX_COL; ++i) {
-        for (int j = 0; j < cur_col; ++j) {
-            //从FFT_FRE中获取对应排序索引的频率,目前取最大的6列，即最后6列
-//            std::cout << " i: "  << i << "  j: " << j << std::endl;
-            index = mat_index(i, j);
-//            std::cout << " index: "  << index << std::endl;
-            result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
-//            std::cout << "result:  " << result(i, j) << std::endl;
-        }
-    }
-
-//    std::cout << result.rows() << "   " << result.cols() << std::endl;
-    idx = getidx(result, GREATE, MAX_DB);
-    setidx(result, idx, 0);
-
-    return result;
-}
-
-Eigen::MatrixXf features_buffer(std::string path3){
-    if(!IF_INIT)
-        frequencyInit();
-    Eigen::MatrixXf output;
-    std::vector<Real> audio;
-    readFile(path3, audio);
-    stft(audio, output);
-//    stft(path3, output);
-    output = ampliTudeToDb(output);
-//    std::cout << output.rows() << "   " << output.cols() << std::endl;
-
-    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
-    setidx(output, idx, SET_MIN_DB);
-
-//    Eigen::MatrixXi mat_index = argsort(output, 1);
-//    mat_index.transposeInPlace();
-#if 1
-    output.transposeInPlace();
-    Eigen::MatrixXi mat_index = argsort(output, 0);
-//    mat_index.transposeInPlace();
-#endif
-
-    int cur_col = mat_index.cols();
-//    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
-//    std::cout << MATRIX_COL-MATRIX_RANGE << std::endl;
-    Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
-    int index;
-    for (int i = MATRIX_COL-MATRIX_RANGE; i < MATRIX_COL; ++i) {
-        for (int j = 0; j < cur_col; ++j) {
-            //从FFT_FRE中获取对应排序索引的频率,目前取最大的6列，即最后6列
-            index = mat_index(i, j);
-            result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
-        }
-    }
-
-    idx = getidx(result, GREATE, MAX_DB);
-    setidx(result, idx, 0);
-
-
-    return result;
-}
-
-Eigen::MatrixXf features(std::string path3){
-    if(!IF_INIT)
-        frequencyInit();
-    Eigen::MatrixXf output;
-    stft(path3, output);
-    output = ampliTudeToDb(output);
-//    std::cout << output.rows() << "   " << output.cols() << std::endl;
-
-    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
-    setidx(output, idx, SET_MIN_DB);
-
-//    Eigen::MatrixXi mat_index = argsort(output, 1);
-//    mat_index.transposeInPlace();
-#if 1
-    output.transposeInPlace();
-    Eigen::MatrixXi mat_index = argsort(output, 0);
-//    mat_index.transposeInPlace();
-#endif
-
-    int cur_col = mat_index.cols();
-//    std::cout << mat_index.rows() << "   " << mat_index.cols() << std::endl;
-//    std::cout << MATRIX_COL-MATRIX_RANGE << std::endl;
-    Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
-    int index;
-    for (int i = MATRIX_COL-MATRIX_RANGE; i < MATRIX_COL; ++i) {
-        for (int j = 0; j < cur_col; ++j) {
-            //从FFT_FRE中获取对应排序索引的频率,目前取最大的6列，即最后6列
-            index = mat_index(i, j);
-            result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
-        }
-    }
-
-    idx = getidx(result, GREATE, MAX_DB);
-    setidx(result, idx, 0);
-
-
-    return result;
-}
-
 static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     if(!IF_INIT)
         frequencyInit();
@@ -344,9 +146,9 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     Algorithm* spectrum = factory.create("Spectrum",
                                          "size", framesize);
 
-    Algorithm* pitchDetect = factory.create("PitchYinFFT",
-                                            "frameSize", framesize,
-                                            "sampleRate", sr);
+//    Algorithm* pitchDetect = factory.create("PitchYinFFT",
+//                                            "frameSize", framesize,
+//                                            "sampleRate", sr);
 
 //    for (int l = 0; l < audio.size(); ++l) {
 //        std::cout << audio[l] << std::endl;
@@ -409,124 +211,7 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     // clean up
     delete frameCutter;
     delete spectrum;
-    delete pitchDetect;
-
-    out.resize(i, MATRIX_COL);
-    for (int k = 0; k < i; ++k) {
-        for (int j = 0; j < MATRIX_COL; ++j) {
-            out(k, j) = matrix[k][j];
-
-//            if(k == 0)
-//                std::cout << out(k, j) << std::endl;
-        }
-    }
-}
-
-static void stft(std::string path, Eigen::MatrixXf &out){
-    //Construct a matrix
-    typedef std::vector<std::vector<float> >  Tmatrix;
-    Tmatrix matrix;
-    matrix.resize(MATRIX_ROW);
-    for (int i = 0; i < MATRIX_ROW; i++)  matrix[i].resize(MATRIX_COL);
-
-    essentia::init();
-//    Pool pool;
-    int framesize = FRAMESIZE;
-    int hopsize = HOPSIZE;
-    int sr = SAMPLERATE;
-    AlgorithmFactory& factory = AlgorithmFactory::instance();
-
-    // audio loader (we always need it...)
-    Algorithm* audioload = factory.create("MonoLoader",
-                                          "filename", path,
-                                          "sampleRate",sr);
-//                                          "sampleRate",sr,
-//                                          "downmix","mix");
-//    cout << audioload << endl;
-    std::vector<Real> audio;
-    audioload->output("audio").set(audio);
-    audioload->compute();
-
-//    for (int l = 0; l < audio.size(); ++l) {
-//        std::cout << audio[l] << std::endl;
-//    }
-//    std::cout << audio.size() << std::endl;
-
-
-    // create algorithms
-    Algorithm* frameCutter = factory.create("FrameCutter",
-                                            "frameSize", framesize,
-                                            "hopSize", hopsize,
-                                            "startFromZero", false);
-
-    Algorithm* window = factory.create("Windowing",
-                                       "type", "hann",
-                                       "size",framesize,
-                                       "zeroPadding", 0);
-
-    Algorithm* spectrum = factory.create("Spectrum",
-                                         "size", framesize);
-
-    Algorithm* pitchDetect = factory.create("PitchYinFFT",
-                                            "frameSize", framesize,
-                                            "sampleRate", sr);
-
-    // configure frameCutter:
-    std::vector<Real> frame;
-    frameCutter->input("signal").set(audio);
-    frameCutter->output("frame").set(frame);
-
-    // configure windowing:
-    std::vector<Real> windowedframe;
-    window->input("frame").set(frame);
-    window->output("frame").set(windowedframe);
-
-    // configure spectrum:
-    std::vector<Real> spec;
-    spectrum->input("frame").set(windowedframe);
-    spectrum->output("spectrum").set(spec);
-
-    // configure pitch extraction:
-//    Real thisPitch = 0., thisConf = 0;
-//    Real localTime=0.;
-//    std::vector<Real> allPitches, allConf, time;
-//    pitchDetect->input("spectrum").set(spec);
-//    pitchDetect->output("pitch").set(thisPitch);
-//    pitchDetect->output("pitchConfidence").set(thisConf);
-
-    // process:
-    int i = 0;
-//    std::cout << " 222" << std::endl;
-    while (true) {
-        frameCutter->compute();
-
-        if (!frame.size())
-            break;
-
-        if (isSilent(frame))
-            continue;
-
-        window->compute();
-        spectrum->compute();
-//        pitchDetect->compute();
-//        allPitches.push_back(thisPitch);
-//        localTime+=float(hopsize)/float(sr);
-//        time.push_back(localTime);
-//        allConf.push_back(thisConf);
-
-        for (int j = 0; j < spec.size(); ++j) {
-            matrix[i][j] = spec[j];
-        }
-
-//        memcpy(matrix[i].data(), spec.data(), sizeof(float)*spec.size());
-
-        ++i;
-    }
-//    std::cout << " 111" << std::endl;
-    // clean up
-    delete frameCutter;
-    delete spectrum;
-    delete pitchDetect;
+//    delete pitchDetect;
 
     out.resize(i, MATRIX_COL);
     for (int k = 0; k < i; ++k) {
@@ -589,24 +274,67 @@ static void readFile(std::string path, std::vector<Real> &audio){
 void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio){
     audio.clear();
 
+//    std::cout << "len: " << len << std::endl;
     //使用静态分配的内存，看是否比动态分配的速度快
     static float in[MAXBUFFLEN];
-    static float out[RATIOSIZE*MAXBUFFLEN];
+    static float out[RESAMBUFFLEN];
     memset(in, 0, sizeof(float)*MAXBUFFLEN);
-    memset(out, 0, sizeof(float)*MAXBUFFLEN*RATIOSIZE);
+    memset(out, 0, sizeof(float)*RESAMBUFFLEN);
     SRC_DATA data;
     data.src_ratio = SAMPLERATE / ORRSAMPLE;
-    for (int j = 20*1025; j < len/2; ++j) {
+//    std::cout << len/2 << std::endl;
+    int j;
+    for (j = 22*1025; j < len/2; ++j) {
         char bl = buffer[2*j];
         char bh = buffer[2*j+1];
 
         short s = (short)((bh & 0x00FF) << 8 | bl & 0x00FF);
         float ft = s / 32768.0;
-        in[j-20*1025] = ft;
+        in[j-22*1025] = ft;
 //        std::cout << f << std::endl;
     }
-    data.input_frames = MAXBUFFLEN;
-    data.output_frames = MAXBUFFLEN*RATIOSIZE;
+    data.input_frames = j-22*1025;
+//    data.input_frames = MAXBUFFLEN;
+    data.output_frames = RESAMBUFFLEN;
+    data.data_in = in;
+    data.data_out = out;
+    int error;
+    if(error = src_simple(&data, SRC_SINC_FASTEST, 1)){
+        std::cout << src_strerror(error) << std::endl;
+    }
+//    std::cout << data.output_frames_gen << std::endl;
+
+    for (int i = 0; i < data.output_frames_gen; ++i) {
+        audio.push_back(out[i]);
+    }
+}
+
+
+void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio, float pre, float cmp_length){
+    audio.clear();
+
+    //使用静态分配的内存，看是否比动态分配的速度快
+    static float in[MAXBUFFLEN];
+    static float out[RESAMBUFFLEN];
+    memset(in, 0, sizeof(float)*MAXBUFFLEN);
+    memset(out, 0, sizeof(float)*RESAMBUFFLEN);
+    SRC_DATA data;
+    data.src_ratio = SAMPLERATE / ORRSAMPLE;
+    len = (len - pre * FRAMELEN) * cmp_length;
+//    std::cout << len/2 << std::endl;
+    int j;
+    for (j = (int)(pre*FRAMELEN); j < (len+pre*FRAMELEN)/2; ++j) {
+        char bl = buffer[2*j];
+        char bh = buffer[2*j+1];
+
+        short s = (short)((bh & 0x00FF) << 8 | bl & 0x00FF);
+        float ft = s / 32768.0;
+        in[j-(int)(pre*FRAMELEN)] = ft;
+//        std::cout << f << std::endl;
+    }
+//    std::cout << "len:" << len/2 << "  j:" << j-pre*FRAMELEN/2 << std::endl;
+    data.input_frames = j-pre*FRAMELEN/2;
+    data.output_frames = RESAMBUFFLEN;
     data.data_in = in;
     data.data_out = out;
     int error;
@@ -673,5 +401,53 @@ Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, fl
 //    setidx(result, idx, 0);
 
 
+    return result;
+}
+
+Eigen::MatrixXf features_buffer(const char *org_buffer, unsigned int org_len, float pre, float cmp_length){
+    if(!IF_INIT)
+        frequencyInit();
+
+    Eigen::MatrixXf output;
+    std::vector<Real> audio;
+
+    startTime = clock();
+    bufferToFloat(org_buffer, org_len, audio, pre, cmp_length);
+    endTime = clock();
+    std::cout << "bufferToFloat Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+
+    startTime = clock();
+    stft(audio, output);
+    endTime = clock();
+    std::cout << "stft Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    startTime = clock();
+    output = ampliTudeToDb(output);
+    endTime = clock();
+    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+
+    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
+    setidx(output, idx, SET_MIN_DB);
+
+//    Eigen::MatrixXi mat_index = argsort(output, 1);
+//    mat_index.transposeInPlace();
+#if 1
+    startTime = clock();
+    output.transposeInPlace();
+    Eigen::MatrixXi mat_index = argsort(output, 0);
+    endTime = clock();
+    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//    mat_index.transposeInPlace();
+#endif
+
+    int cur_col = mat_index.cols();
+    Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
+    int index;
+    for (int i = MATRIX_COL-MATRIX_RANGE; i < MATRIX_COL; ++i) {
+        for (int j = 0; j < cur_col; ++j) {
+            //从FFT_FRE中获取对应排序索引的频率,目前取最大的6列，即最后6列
+            index = mat_index(i, j);
+            result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
+        }
+    }
     return result;
 }
