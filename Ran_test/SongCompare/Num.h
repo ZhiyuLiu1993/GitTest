@@ -20,13 +20,13 @@ extern Eigen::MatrixXi FFT_FRE;
 void frequencyInit();
 
 //实现python中argsort函数，将矩阵按列(type=0)按行(type=1)进行排序，输出索引
-Eigen::MatrixXi argsort(const Eigen::MatrixXf &input, int type);
+Eigen::MatrixXi argSort(const Eigen::MatrixXf &input, int type);
 
 //获取矩阵中小于或大于某个值的索引，type = 1表示小于，0表示大于
-std::vector<std::pair<int, int> > getidx(const Eigen::MatrixXf &input, int type, int thres);
+std::vector<std::pair<int, int> > getIdx(const Eigen::MatrixXf &input, int type, int thres);
 
 //将矩阵中的对应索引值设置为传入值
-void setidx(Eigen::MatrixXf &input, const std::vector<std::pair<int, int> > &idx, float target);
+void setIdx(Eigen::MatrixXf &input, const std::vector<std::pair<int, int> > &idx, float target);
 
 //
 Eigen::MatrixXf ampliTudeToDb(Eigen::MatrixXf &input, float amin=1e-5, float top_db=80.0);

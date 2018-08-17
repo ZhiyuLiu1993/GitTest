@@ -65,8 +65,8 @@ Eigen::MatrixXi featureDecoding(const Eigen::MatrixXf &input);
 
 //  特征处理模块的函数
 
-Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, float cmp_length);
-Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length);
+Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, float cmp_length);
+Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length);
 
 //获取stft后的矩阵
 static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out);

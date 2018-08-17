@@ -3,18 +3,25 @@
 //
 
 #include "Num.h"
-
 #include <iostream>
 
-static void SortRows(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
-static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
-static void SortCols2(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int row);
-static void SortRowsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
+static clock_t startTime, endTime;
+
+//对行排序，按行存储，使用快速排序
+static void sortRowsQuick(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
+//对列排序，按列存储，使用快速排序
+static void sortColsQuick(const Eigen::MatrixXf &input, int n, int *output, int m, int row);
+//对行排序，与存储方式无关(插入排序)
+static void sortRowsInsert(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int row);
+//对列排序，按列存储，使用归并排序
+static void sortColsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
                           int first, int last, int rows);
+//对列排序，与存储方式无关(插入排序)
+static void sortColsInsert(const Eigen::MatrixXf &input, Eigen::MatrixXi &output);
 
 Eigen::MatrixXi FFT_FRE(1, 1025);
 
-Eigen::MatrixXi argsort(const Eigen::MatrixXf &input, int type){
+Eigen::MatrixXi argSort(const Eigen::MatrixXf &input, int type){
     int rows = input.rows();
     int cols = input.cols();
     Eigen::MatrixXi output(rows, cols);
@@ -32,15 +39,19 @@ Eigen::MatrixXi argsort(const Eigen::MatrixXf &input, int type){
 //        }
 //        std::cout << std::endl;
 //        std::cout << output << std::endl;
+        startTime = clock();
         int *temp = new int[rows+1];
         for (int i = 0; i < cols; ++i) {
 //            int *id = output.data();
 //            Sort(input, cols, id, cols, i);
 //            SortCols(input, output.data()+i, rows, cols, i);
-//            SortRows2(input, rows, output.data()+i*rows, rows, i);
-            SortRowsMerge(input, output.data()+i*rows, temp, 0, rows-1, i);
+//            sortColsQuick(input, rows, output.data()+i*rows, rows, i);
+            sortColsMerge(input, output.data()+i*rows, temp, 0, rows-1, i);
+//            sortColsInsert(input, output);
         }
         delete []temp;
+        endTime = clock();
+        std::cout << "sort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
     } else{      //按行
         for (int i = 0; i < rows; ++i) {
@@ -64,8 +75,8 @@ Eigen::MatrixXi argsort(const Eigen::MatrixXf &input, int type){
 //            std::cout << std::endl;
 
 //            int *id = output.data();
-            SortCols2(input, output, i);
-//            SortRows(input, cols, id+i*cols, cols, i);
+            sortRowsInsert(input, output, i);
+//            sortRowsQuick(input, cols, id+i*cols, cols, i);
         }
     }
 //    std::cout << output << std::endl;
@@ -124,19 +135,19 @@ static void merge(const Eigen::MatrixXf &input, int first, int mid,
 
 //merge sort
 //TODO:考虑不传整个矩阵只传部分
-static void SortRowsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
+static void sortColsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
                           int first, int last, int rows) {
     if(first < last){
         int mid = (first + last) / 2;
-        SortRowsMerge(input, output, temp, first, mid, rows);
-        SortRowsMerge(input, output, temp, mid+1, last, rows);
+        sortColsMerge(input, output, temp, first, mid, rows);
+        sortColsMerge(input, output, temp, mid+1, last, rows);
         merge(input, first, mid, last, output, temp, rows);
     }
 }
 
 //FIXME::n是多余的
-//因为Matrix的矩阵数据是按列存储的,所以在排序计算索引时时使用不同的算法，按列时使用递归的快排
-static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, int row) {
+//因为Matrix的矩阵数据是按列存储的,所以在排序计算索引时使用不同的算法，按列时使用递归的快排
+static void sortColsQuick(const Eigen::MatrixXf &input, int n, int *output, int m, int row) {
     if (m > 1) {
         int i = 0;
         int j = m - 1;
@@ -152,8 +163,8 @@ static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, i
                 output[j--] = output[i];  //只改变索引顺序
         }
         output[i] = tmp;
-        SortRows2(input, n, output, i, row);
-        SortRows2(input, n, output+i+1, m-i-1, row);
+        sortColsQuick(input, n, output, i, row);
+        sortColsQuick(input, n, output+i+1, m-i-1, row);
     }
 //    for (int j = 0; j < m; ++j) {
 //        std::cout << output[j];
@@ -162,7 +173,7 @@ static void SortRows2(const Eigen::MatrixXf &input, int n, int *output, int m, i
 }
 //实现两种类型sort,返回索引
 //按行,快排,这个函数对应的是按行存储的格式，目前没有使用
-static void SortRows(const Eigen::MatrixXf &input, int n, int *output, int m, int row) {
+static void sortRowsQuick(const Eigen::MatrixXf &input, int n, int *output, int m, int row) {
     if (m > 1) {
         int i = 0;
         int j = m - 1;
@@ -178,18 +189,16 @@ static void SortRows(const Eigen::MatrixXf &input, int n, int *output, int m, in
                 output[j--] = output[i];  //只改变索引顺序
         }
         output[i] = tmp;
-        SortRows(input, n, output, i, row);
-        SortRows(input, n, output+i+1, m-i-1, row);
+        sortRowsQuick(input, n, output, i, row);
+        sortRowsQuick(input, n, output+i+1, m-i-1, row);
     }
 //    for (int j = 0; j < m; ++j) {
 //        std::cout << output[j];
 //    }
 //    std::cout << std::endl;
 }
-
 //按行,插入排序,与存储方式无关
-static void SortCols2(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int row){
-//static void SortCols2(const Eigen::MatrixXf &input, int *output, int *id, int rows, int cols, int col) {
+static void sortRowsInsert(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int row){
     int cols = input.cols();
 
     for (int i = 1; i < cols; ++i) {
@@ -197,6 +206,21 @@ static void SortCols2(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int
             int id = output(row, j);
             output(row, j) = output(row, j-1);
             output(row, j-1) = id;
+        }
+    }
+
+}
+//按列,插入排序,与存储方式无关
+static void sortColsInsert(const Eigen::MatrixXf &input, Eigen::MatrixXi &output){
+    int rows = input.rows();
+
+    for (int col = 0; col < input.cols(); ++col) {
+        for (int i = 1; i < rows; ++i) {
+            for (int j = i; j>0 && input(output(j, col), col) < input(output(j-1, col), col); --j) {
+                int id = output(j, col);
+                output(j, col) = output(j-1, col);
+                output(j-1, col) = id;
+            }
         }
     }
 
@@ -231,7 +255,7 @@ static void SortCols2(const Eigen::MatrixXf &input, Eigen::MatrixXi &output, int
 //    }
 //}
 
-std::vector<std::pair<int, int> > getidx(const Eigen::MatrixXf &input, int type, int thres){
+std::vector<std::pair<int, int> > getIdx(const Eigen::MatrixXf &input, int type, int thres){
     int rows = input.rows();
     int cols = input.cols();
     std::vector<std::pair<int, int> > result;
@@ -255,7 +279,7 @@ std::vector<std::pair<int, int> > getidx(const Eigen::MatrixXf &input, int type,
     return result;
 }
 
-void setidx(Eigen::MatrixXf &input, const std::vector<std::pair<int, int> > &idx, float target){
+void setIdx(Eigen::MatrixXf &input, const std::vector<std::pair<int, int> > &idx, float target){
     for (int i = 0; i < idx.size(); ++i) {
         input(idx[i].first, idx[i].second) = target;
     }

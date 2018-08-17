@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
     readFile(path4, &buf2, len2);
 
 //    startTime = clock();
-//    std::cout << sim_distance(buf1, len1, buf2, len2, ratio) << std::endl;
-//    std::cout << sim_distance(buf1, len1, buf2, len2, 0.5) << std::endl;
+//    std::cout << simDistance(buf1, len1, buf2, len2, ratio) << std::endl;
+//    std::cout << simDistance(buf1, len1, buf2, len2, 0.5) << std::endl;
 //    endTime = clock();
 //    std::cout << "Total Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    std::cout << "-----------------------------------------------------------" << endl;

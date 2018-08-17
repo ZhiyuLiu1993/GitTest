@@ -4,6 +4,8 @@
 
 #include <iomanip>
 #include "Comparing.h"
+#include "Features.h"
+#include "Num.h"
 
 //static clock_t startTime, endTime;
 static double degree(double a);
@@ -109,18 +111,18 @@ static double degree(double a){
     if (0.45 < a && a <= 1.0) return (0.20 * (1.0 - a) / 0.55);
 }
 
-float sim_distance(const char *org_buffer, unsigned int org_len,
+float simDistance(const char *org_buffer, unsigned int org_len,
                    const char *test_buffer, unsigned int test_len,
                    float cmp_length){
 //    startTime = clock();
-    Eigen::MatrixXf feature1 = features_buffer(org_buffer, org_len, cmp_length);
+    Eigen::MatrixXf feature1 = featuresBuffer(org_buffer, org_len, cmp_length);
 //    endTime = clock();
 //    std::cout << "feature_buffer Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
-    Eigen::MatrixXf feature2 = features_buffer(test_buffer, test_len, cmp_length);
+    Eigen::MatrixXf feature2 = featuresBuffer(test_buffer, test_len, cmp_length);
 
     return computeDegree(feature1, feature2);
 }
 
 Eigen::MatrixXf features(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length){
-    return features_buffer(ori_buffer, ori_len, pre, cmp_length);
+    return featuresBuffer(ori_buffer, ori_len, pre, cmp_length);
 }

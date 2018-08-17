@@ -107,6 +107,7 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
         frequencyInit();
     //Construct a matrix
     typedef std::vector<std::vector<float> >  Tmatrix;
+    ///可以根据audio的长度估计矩阵的行数
     Tmatrix matrix;
     matrix.resize(MATRIX_ROW);
     for (int i = 0; i < MATRIX_ROW; i++)  matrix[i].resize(MATRIX_COL);
@@ -122,13 +123,7 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
 //    Algorithm* audioload = factory.create("MonoLoader",
 //                                          "sampleRate",sr,
 //                                          "downmix","mix");
-//    cout << audioload << endl;
 //    std::vector<Real> audio;
-//    for (int j = 0; j < len; ++j) {
-//        audio.push_back(*buffer++);
-//    }
-//    free(buffer);
-//    buffer = NULL;
 //    audioload->output("audio").set(audio);
 //    audioload->compute();
 
@@ -275,7 +270,7 @@ void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audi
     audio.clear();
 
 //    std::cout << "len: " << len << std::endl;
-    //使用静态分配的内存，看是否比动态分配的速度快
+    ////使用静态分配的内存，看是否比动态分配的速度快   FIME:在buffer过长时会出现问，此处可以根据len的长度进行动态分配
     static float in[MAXBUFFLEN];
     static float out[RESAMBUFFLEN];
     memset(in, 0, sizeof(float)*MAXBUFFLEN);
@@ -347,7 +342,7 @@ void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audi
     }
 }
 
-Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, float cmp_length){
+Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, float cmp_length){
     if(!IF_INIT)
         frequencyInit();
 
@@ -370,15 +365,15 @@ Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, fl
 //    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    std::cout << output.rows() << "   " << output.cols() << std::endl;
 
-    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
-    setidx(output, idx, SET_MIN_DB);
+    std::vector<std::pair<int, int> > idx = getIdx(output, SMALL, MIN_HUMAN_DB);
+    setIdx(output, idx, SET_MIN_DB);
 
-//    Eigen::MatrixXi mat_index = argsort(output, 1);
+//    Eigen::MatrixXi mat_index = argSort(output, 1);
 //    mat_index.transposeInPlace();
 #if 1
 //    startTime = clock();
     output.transposeInPlace();
-    Eigen::MatrixXi mat_index = argsort(output, 0);
+    Eigen::MatrixXi mat_index = argSort(output, 0);
 //    endTime = clock();
 //    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    mat_index.transposeInPlace();
@@ -397,42 +392,42 @@ Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, fl
         }
     }
 
-//    idx = getidx(result, GREATE, MAX_DB);
-//    setidx(result, idx, 0);
+//    idx = getIdx(result, GREATE, MAX_DB);
+//    setIdx(result, idx, 0);
 
 
     return result;
 }
 
-Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length){
+Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, float pre, float cmp_length){
     if(!IF_INIT)
         frequencyInit();
 
     Eigen::MatrixXf output;
     std::vector<Real> audio;
 
-    startTime = clock();
+//    startTime = clock();
     bufferToFloat(ori_buffer, ori_len, audio, pre, cmp_length);
-    endTime = clock();
-    std::cout << "bufferToFloat Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//    endTime = clock();
+//    std::cout << "bufferToFloat Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
-    startTime = clock();
+//    startTime = clock();
     stft(audio, output);
-    endTime = clock();
-    std::cout << "stft Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
-    startTime = clock();
+//    endTime = clock();
+//    std::cout << "stft Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//    startTime = clock();
     output = ampliTudeToDb(output);
-    endTime = clock();
-    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//    endTime = clock();
+//    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
-    startTime = clock();
-    std::vector<std::pair<int, int> > idx = getidx(output, SMALL, MIN_HUMAN_DB);
-    setidx(output, idx, SET_MIN_DB);
+//    startTime = clock();
+    std::vector<std::pair<int, int> > idx = getIdx(output, SMALL, MIN_HUMAN_DB);
+    setIdx(output, idx, SET_MIN_DB);
 
-//    Eigen::MatrixXi mat_index = argsort(output, 1);
-//    mat_index.transposeInPlace();
     output.transposeInPlace();
-    Eigen::MatrixXi mat_index = argsort(output, 0);
+    Eigen::MatrixXi mat_index = argSort(output, 0);
+//    Eigen::MatrixXi mat_index = argSort(output, 1);
+//    mat_index.transposeInPlace();
 //    mat_index.transposeInPlace();
 
     int cur_col = mat_index.cols();
@@ -445,7 +440,7 @@ Eigen::MatrixXf features_buffer(const char *ori_buffer, unsigned int ori_len, fl
             result(i-(MATRIX_COL-MATRIX_RANGE), j) = FFT_FRE(0, index);
         }
     }
-    endTime = clock();
-    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//    endTime = clock();
+//    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     return result;
 }
