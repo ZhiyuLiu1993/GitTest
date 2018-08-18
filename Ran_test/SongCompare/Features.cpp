@@ -109,8 +109,13 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     typedef std::vector<std::vector<float> >  Tmatrix;
     ///可以根据audio的长度估计矩阵的行数
     Tmatrix matrix;
-    matrix.resize(MATRIX_ROW);
-    for (int i = 0; i < MATRIX_ROW; i++)  matrix[i].resize(MATRIX_COL);
+//    matrix.resize(MATRIX_ROW);
+//    for (int i = 0; i < MATRIX_ROW; i++)  matrix[i].resize(MATRIX_COL);
+    //矩阵行数根据audio的长度进行预设
+//            std::cout << audio.size() << std::endl;
+    int matrix_row = audio.size() / MATRIX_AUDIO;
+    matrix.resize(matrix_row);
+    for (int i = 0; i < matrix_row; i++)  matrix[i].resize(MATRIX_COL);
 
     essentia::init();
 //    Pool pool;
@@ -202,7 +207,6 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     }
 //    std::cout << spec.size() << std::endl;
 //    std::cout << i << std::endl;
-//    std::cout << " 111" << std::endl;
     // clean up
     delete frameCutter;
     delete spectrum;
@@ -307,29 +311,36 @@ void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audi
 
 void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audio, float pre, float cmp_length){
     audio.clear();
-
     //使用静态分配的内存，看是否比动态分配的速度快
-    static float in[MAXBUFFLEN];
-    static float out[RESAMBUFFLEN];
-    memset(in, 0, sizeof(float)*MAXBUFFLEN);
-    memset(out, 0, sizeof(float)*RESAMBUFFLEN);
+//    static float in[MAXBUFFLEN];
+//    static float out[RESAMBUFFLEN];
+//    memset(in, 0, sizeof(float)*MAXBUFFLEN);
+//    memset(out, 0, sizeof(float)*RESAMBUFFLEN);
     SRC_DATA data;
     data.src_ratio = SAMPLERATE / ORRSAMPLE;
     len = (len - pre * FRAMELEN) * cmp_length;
+    if(len&1)
+        ++len;
 //    std::cout << len/2 << std::endl;
-    int j;
-    for (j = (int)(pre*FRAMELEN); j < (len+pre*FRAMELEN)/2; ++j) {
+    //动态分配内存   除2是因为两个char对应一个float
+    float *in = (float *)malloc(len / 2 * sizeof(float));
+    float *out = (float *)malloc(len / 2 * sizeof(float) * SAMPLEBUFF);
+
+    int j = (int)(pre*FRAMELEN/2);
+    for (; j < (len+pre*FRAMELEN)/2; ++j) {
         char bl = buffer[2*j];
         char bh = buffer[2*j+1];
 
         short s = (short)((bh & 0x00FF) << 8 | bl & 0x00FF);
         float ft = s / 32768.0;
-        in[j-(int)(pre*FRAMELEN)] = ft;
+        in[j-(int)(pre*FRAMELEN/2)] = ft;
 //        std::cout << f << std::endl;
     }
 //    std::cout << "len:" << len/2 << "  j:" << j-pre*FRAMELEN/2 << std::endl;
-    data.input_frames = j-pre*FRAMELEN/2;
-    data.output_frames = RESAMBUFFLEN;
+//    data.input_frames = j-pre*FRAMELEN/2;
+//    data.output_frames = RESAMBUFFLEN;
+    data.input_frames = len/2;
+    data.output_frames = len*SAMPLEBUFF/2;
     data.data_in = in;
     data.data_out = out;
     int error;
@@ -340,6 +351,9 @@ void bufferToFloat(const char *buffer, unsigned int len, std::vector<Real> &audi
     for (int i = 0; i < data.output_frames_gen; ++i) {
         audio.push_back(out[i]);
     }
+
+    free(in);
+    free(out);
 }
 
 Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, float cmp_length){

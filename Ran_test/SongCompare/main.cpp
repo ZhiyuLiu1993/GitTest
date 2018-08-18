@@ -62,20 +62,20 @@ int main(int argc, char *argv[]) {
     char *buf2;
     unsigned int len2;
 
-//    if(argc != 4){
-//        cout << "param num error!" << endl;
-//        return -1;
-//    }
+    if(argc != 4){
+        cout << "param num error!" << endl;
+        return -1;
+    }
+
+    int i = atoi(argv[1]);
+    int j = atoi(argv[2]);
+    float ratio = atof(argv[3]);
+    std::cout << "i:" << i << " j:" << j << " ratio:" << ratio << endl;
 //
-//    int i = atoi(argv[1]);
-//    int j = atoi(argv[2]);
-//    float ratio = atof(argv[3]);
-//    std::cout << "i:" << i << " j:" << j << " ratio:" << ratio << endl;
-//
-//    readFile(path[i], &buf1, len1);
-//    readFile(path[j], &buf2, len2);
-    readFile(path0, &buf1, len1);
-    readFile(path4, &buf2, len2);
+    readFile(path[i], &buf1, len1);
+    readFile(path[j], &buf2, len2);
+//    readFile(path0, &buf1, len1);
+//    readFile(path1, &buf2, len2);
 
 //    startTime = clock();
 //    std::cout << simDistance(buf1, len1, buf2, len2, ratio) << std::endl;
@@ -86,19 +86,19 @@ int main(int argc, char *argv[]) {
 
     startAllTime = clock();
     startTime = clock();
-    Eigen::MatrixXf tmp1 = features(buf1, len1, 2.75, 0.5);
+    Eigen::MatrixXf tmp1 = features(buf1, len1, 3, ratio);
     endTime = clock();
     std::cout << "Feature1 Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     startTime = clock();
-    Eigen::MatrixXf tmp2 = features(buf2, len2, 2.75, 0.5);
+    Eigen::MatrixXf tmp2 = features(buf2, len2, 3, ratio);
     endTime = clock();
     std::cout << "Feature2 Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     startTime = clock();
     std::cout << computeDegree(tmp1, tmp2) << endl;
     endTime = clock();
     std::cout << "compute Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
-    std::cout << "-----------------------------------------------------------" << endl;
     endAllTime = clock();
-    std::cout << "compute Time: " << (double)(endAllTime - startAllTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    std::cout << "all Time: " << (double)(endAllTime - startAllTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    std::cout << "-----------------------------------------------------------" << endl;
     return 0;
 }

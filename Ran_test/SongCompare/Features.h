@@ -30,6 +30,8 @@ const float MIN_THR = 0.0000001f;
 const int MATRIX_ROW = 1800;
 const int MATRIX_COL = 1025;
 const int MATRIX_RANGE = 6;
+//audio size 与 预设帧长的比率   FIXME:这个比率还需要测试
+const int MATRIX_AUDIO = 500;
 
 //对分贝的过滤值
 const int MAX_DB = 8000;
@@ -47,7 +49,8 @@ const float ORRSAMPLE = 16000.0;
 const int MAXBUFFLEN = 200000;
 //重采样后缓冲区长度
 const int RESAMBUFFLEN = 2.8 * MAXBUFFLEN;
-
+//重采样缓冲区比率
+const float SAMPLEBUFF = 2.8;
 //每一秒帧的buffer长度
 const int FRAMELEN = 8200;
 
