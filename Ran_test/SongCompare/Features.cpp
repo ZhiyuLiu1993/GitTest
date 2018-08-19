@@ -420,30 +420,40 @@ Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, flo
     Eigen::MatrixXf output;
     std::vector<Real> audio;
 
-//    startTime = clock();
+    startTime = clock();
     bufferToFloat(ori_buffer, ori_len, audio, pre, cmp_length);
-//    endTime = clock();
-//    std::cout << "bufferToFloat Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    endTime = clock();
+    std::cout << "bufferToFloat Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
-//    startTime = clock();
+    startTime = clock();
     stft(audio, output);
-//    endTime = clock();
-//    std::cout << "stft Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
-//    startTime = clock();
+    endTime = clock();
+    std::cout << "stft Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    startTime = clock();
     output = ampliTudeToDb(output);
-//    endTime = clock();
-//    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+    endTime = clock();
+    std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
-//    startTime = clock();
+    startTime = clock();
     std::vector<std::pair<int, int> > idx = getIdx(output, SMALL, MIN_HUMAN_DB);
     setIdx(output, idx, SET_MIN_DB);
+    endTime = clock();
+    std::cout << "setIdx Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
+//    startTime = clock();
     output.transposeInPlace();
+//    endTime = clock();
+//    std::cout << "trans Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+
+    startTime = clock();
     Eigen::MatrixXi mat_index = argSort(output, 0);
+    endTime = clock();
+    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 //    Eigen::MatrixXi mat_index = argSort(output, 1);
 //    mat_index.transposeInPlace();
 //    mat_index.transposeInPlace();
 
+//    startTime = clock();
     int cur_col = mat_index.cols();
     Eigen::MatrixXf result(MATRIX_RANGE, cur_col);
     int index;
@@ -455,6 +465,6 @@ Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, flo
         }
     }
 //    endTime = clock();
-//    std::cout << "argsort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//    std::cout << "getFre Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     return result;
 }

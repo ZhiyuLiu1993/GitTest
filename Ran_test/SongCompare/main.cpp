@@ -62,20 +62,20 @@ int main(int argc, char *argv[]) {
     char *buf2;
     unsigned int len2;
 
-    if(argc != 4){
-        cout << "param num error!" << endl;
-        return -1;
-    }
-
-    int i = atoi(argv[1]);
-    int j = atoi(argv[2]);
-    float ratio = atof(argv[3]);
-    std::cout << "i:" << i << " j:" << j << " ratio:" << ratio << endl;
+//    if(argc != 4){
+//        cout << "param num error!" << endl;
+//        return -1;
+//    }
 //
-    readFile(path[i], &buf1, len1);
-    readFile(path[j], &buf2, len2);
-//    readFile(path0, &buf1, len1);
-//    readFile(path1, &buf2, len2);
+//    int i = atoi(argv[1]);
+//    int j = atoi(argv[2]);
+//    float ratio = atof(argv[3]);
+//    std::cout << "i:" << i << " j:" << j << " ratio:" << ratio << endl;
+////
+//    readFile(path[i], &buf1, len1);
+//    readFile(path[j], &buf2, len2);
+    readFile(path0, &buf1, len1);
+    readFile(path2, &buf2, len2);
 
 //    startTime = clock();
 //    std::cout << simDistance(buf1, len1, buf2, len2, ratio) << std::endl;
@@ -86,11 +86,11 @@ int main(int argc, char *argv[]) {
 
     startAllTime = clock();
     startTime = clock();
-    Eigen::MatrixXf tmp1 = features(buf1, len1, 3, ratio);
+    Eigen::MatrixXf tmp1 = features(buf1, len1, 3, 0.5);
     endTime = clock();
     std::cout << "Feature1 Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     startTime = clock();
-    Eigen::MatrixXf tmp2 = features(buf2, len2, 3, ratio);
+    Eigen::MatrixXf tmp2 = features(buf2, len2, 3, 0.5);
     endTime = clock();
     std::cout << "Feature2 Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
     startTime = clock();

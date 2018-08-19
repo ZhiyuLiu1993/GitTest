@@ -18,6 +18,8 @@ static void sortColsMerge(const Eigen::MatrixXf &input, int *output, int *temp,
                           int first, int last, int rows);
 //对列排序，与存储方式无关(插入排序)
 static void sortColsInsert(const Eigen::MatrixXf &input, Eigen::MatrixXi &output);
+//对列排序,插入排序,存储方式为列
+static void sortColsInsert2(const float *input, int *output, int num);
 
 Eigen::MatrixXi FFT_FRE(1, 1025);
 
@@ -39,19 +41,20 @@ Eigen::MatrixXi argSort(const Eigen::MatrixXf &input, int type){
 //        }
 //        std::cout << std::endl;
 //        std::cout << output << std::endl;
-        startTime = clock();
+//        std::cout << rows << std::endl;
+//        startTime = clock();
         int *temp = new int[rows+1];
         for (int i = 0; i < cols; ++i) {
 //            int *id = output.data();
 //            Sort(input, cols, id, cols, i);
-//            SortCols(input, output.data()+i, rows, cols, i);
 //            sortColsQuick(input, rows, output.data()+i*rows, rows, i);
-            sortColsMerge(input, output.data()+i*rows, temp, 0, rows-1, i);
+//            sortColsMerge(input, output.data()+i*rows, temp, 0, rows-1, i);
+            sortColsInsert2(input.data()+i*rows,  output.data()+i*rows, rows);
 //            sortColsInsert(input, output);
         }
         delete []temp;
-        endTime = clock();
-        std::cout << "sort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
+//        endTime = clock();
+//        std::cout << "sort Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
     } else{      //按行
         for (int i = 0; i < rows; ++i) {
@@ -224,6 +227,16 @@ static void sortColsInsert(const Eigen::MatrixXf &input, Eigen::MatrixXi &output
         }
     }
 
+}
+//按列,插入排序,存储方式为列
+static void sortColsInsert2(const float *input, int *output, int num){
+    for (int i = 1; i < num; ++i) {
+        for (int j = i; j > 0 && input[output[j]] < input[output[j-1]]; --j) {
+            int id = output[j];
+            output[j] = output[j-1];
+            output[j-1] = id;
+        }
+    }
 }
 //按列,选择排序,对应于存储按行,目前没有使用
 //static void SortCols(const Eigen::MatrixXf &input, int *output, int rows, int cols, int col) {
