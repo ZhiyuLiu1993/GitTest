@@ -292,6 +292,24 @@ std::vector<std::pair<int, int> > getIdx(const Eigen::MatrixXf &input, int type,
     return result;
 }
 
+void getAndSetIdx(Eigen::MatrixXf &input, int type, int thres, float target){
+    int size = input.size();
+    float *data = input.data();
+    if(type){
+        for (int i = 0; i < size; ++i) {
+                if(data[i] <= thres){
+                    data[i] = target;
+                }
+        }
+    } else{
+        for (int i = 0; i < size; ++i) {
+                if(data[i] >= thres){
+                    data[i] = target;
+                }
+        }
+    }
+}
+
 void setIdx(Eigen::MatrixXf &input, const std::vector<std::pair<int, int> > &idx, float target){
     for (int i = 0; i < idx.size(); ++i) {
         input(idx[i].first, idx[i].second) = target;

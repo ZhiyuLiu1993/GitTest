@@ -118,19 +118,10 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     for (int i = 0; i < matrix_row; i++)  matrix[i].resize(MATRIX_COL);
 
     essentia::init();
-//    Pool pool;
     int framesize = FRAMESIZE;
     int hopsize = HOPSIZE;
     int sr = SAMPLERATE;
     AlgorithmFactory& factory = AlgorithmFactory::instance();
-
-    // audio loader (we always need it...)
-//    Algorithm* audioload = factory.create("MonoLoader",
-//                                          "sampleRate",sr,
-//                                          "downmix","mix");
-//    std::vector<Real> audio;
-//    audioload->output("audio").set(audio);
-//    audioload->compute();
 
     // create algorithms
     Algorithm* frameCutter = factory.create("FrameCutter",
@@ -146,14 +137,6 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
     Algorithm* spectrum = factory.create("Spectrum",
                                          "size", framesize);
 
-//    Algorithm* pitchDetect = factory.create("PitchYinFFT",
-//                                            "frameSize", framesize,
-//                                            "sampleRate", sr);
-
-//    for (int l = 0; l < audio.size(); ++l) {
-//        std::cout << audio[l] << std::endl;
-//    }
-//    std::cout << audio.size() << std::endl;
     // configure frameCutter:
     std::vector<Real> frame;
     frameCutter->input("signal").set(audio);
@@ -179,7 +162,6 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
 
     // process:
     int i = 0;
-//    std::cout << " 222" << std::endl;
     while (true) {
         frameCutter->compute();
 
@@ -201,8 +183,6 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
             matrix[i][j] = spec[j];
         }
 
-//        memcpy(matrix[i].data(), spec.data(), sizeof(float)*spec.size());
-
         ++i;
     }
 //    std::cout << spec.size() << std::endl;
@@ -213,12 +193,10 @@ static void stft(std::vector<Real> &audio, Eigen::MatrixXf &out){
 //    delete pitchDetect;
 
     out.resize(i, MATRIX_COL);
+    float *dataOut = out.data();
     for (int k = 0; k < i; ++k) {
         for (int j = 0; j < MATRIX_COL; ++j) {
             out(k, j) = matrix[k][j];
-
-//            if(k == 0)
-//                std::cout << out(k, j) << std::endl;
         }
     }
 }
@@ -435,8 +413,9 @@ Eigen::MatrixXf featuresBuffer(const char *ori_buffer, unsigned int ori_len, flo
     std::cout << "ampliTudeToDb Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 
     startTime = clock();
-    std::vector<std::pair<int, int> > idx = getIdx(output, SMALL, MIN_HUMAN_DB);
-    setIdx(output, idx, SET_MIN_DB);
+//    std::vector<std::pair<int, int> > idx = getIdx(output, SMALL, MIN_HUMAN_DB);
+//    setIdx(output, idx, SET_MIN_DB);
+    getAndSetIdx(output, SMALL, MIN_HUMAN_DB, SET_MIN_DB);
     endTime = clock();
     std::cout << "setIdx Time: " << (double)(endTime - startTime) /CLOCKS_PER_SEC<< "s" << std::endl;;
 

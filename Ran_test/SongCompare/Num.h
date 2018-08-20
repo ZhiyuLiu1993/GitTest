@@ -25,6 +25,9 @@ Eigen::MatrixXi argSort(const Eigen::MatrixXf &input, int type);
 //获取矩阵中小于或大于某个值的索引，type = 1表示小于，0表示大于
 std::vector<std::pair<int, int> > getIdx(const Eigen::MatrixXf &input, int type, int thres);
 
+//获取矩阵中小于或大于某个值的索引，type = 1表示小于，0表示大于，并设置为target的值
+void getAndSetIdx(Eigen::MatrixXf &input, int type, int thres, float target);
+
 //将矩阵中的对应索引值设置为传入值
 void setIdx(Eigen::MatrixXf &input, const std::vector<std::pair<int, int> > &idx, float target);
 
